@@ -1,0 +1,1 @@
+odin build generate_raylib_bindings.odin -out="out/generate_raylib_bindings.exe"
