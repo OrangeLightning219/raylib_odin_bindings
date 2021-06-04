@@ -1,4 +1,4 @@
 *.exe
 *.lib
-*.dll
 *.output
+examples/out
