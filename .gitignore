@@ -1,4 +1,3 @@
 *.exe
-*.lib
 *.output
-examples/out
+examples/out/*.dll

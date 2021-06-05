@@ -146,27 +146,30 @@ generate_typedefs :: proc(file: os.Handle)
 
 parse_structs :: proc(reader: ^bufio.Reader, structs: ^[dynamic]Struct_Info)
 {
+	using strings;
+	using strconv;
+
 	ignore_line(reader);
 	line, err := bufio.reader_read_string(reader, '\n');
 
-	split := strings.split(strings.trim_space(line), " ");
-	struct_count, ok := strconv.parse_int(split[2]);
+	struct_string_header := split(trim_space(line), " ");
+	struct_count, ok := parse_int(struct_string_header[2]);
 	assert(ok);
 	ignore_line(reader);
 
 	for i in 0..<struct_count
 	{
 		line, err = bufio.reader_read_string(reader, '\n');
-		struct_string := strings.split(strings.trim_space(line), " ");
+		struct_string := split(trim_space(line), " ");
 		
 		index := 0;
-		index, ok = strconv.parse_int(struct_string[1][0:len(struct_string[1]) - 1]);
+		index, ok = parse_int(struct_string[1][0:len(struct_string[1]) - 1]);
 		assert(ok);
 
-		name := strings.to_ada_case(struct_string[2]);
+		name := to_ada_case(struct_string[2]);
 		
 		fields_count := 0;
-		fields_count, ok = strconv.parse_int(struct_string[3][1:]);
+		fields_count, ok = parse_int(struct_string[3][1:]);
 		assert(ok);
 
 		fields: [dynamic]Field_Info;
@@ -175,29 +178,29 @@ parse_structs :: proc(reader: ^bufio.Reader, structs: ^[dynamic]Struct_Info)
 		for j in 0..<fields_count
 		{
 			line, err = bufio.reader_read_string(reader, '\n');
-			line = strings.trim_space(line);
+			line = trim_space(line);
 
-			split = strings.split(line, "//");
+			field_with_comment := split(line, "//");
 			
-			comment := split[1];
-			field_string := strings.split(strings.trim_space(split[0]), " ");
+			comment := field_with_comment[1];
+			field_string := split(trim_space(field_with_comment[0]), " ");
 			type := "";
 			names: []string;
 			if field_string[2] == "unsigned"
 			{
 				join_index := 4;
-				if strings.contains(field_string[4], "*")
+				if contains(field_string[4], "*")
 				{
 					join_index = 5;
 				}
-				type = strings.join(field_string[2:join_index], " ");
+				type = join(field_string[2:join_index], " ");
 				names = field_string[join_index:];
 			}
 			else 
 			{
-				if strings.contains(field_string[3], "*") 
+				if contains(field_string[3], "*") 
 				{
-					type = strings.join(field_string[2:4], " ");
+					type = join(field_string[2:4], " ");
 					names = field_string[4:];
 				}
 				else
@@ -207,45 +210,26 @@ parse_structs :: proc(reader: ^bufio.Reader, structs: ^[dynamic]Struct_Info)
 				}
 			}
 
+			type = parse_type(type);
 			for name in names
 			{
 				field_info: Field_Info;
 				field_info.comment = comment;
-				temp_name, _ := strings.remove_all(name, ",");
-
-				if type in types
-				{
-					type = types[type];
-				}
-				
-				if strings.contains(type, "*") && !strings.contains(type, "void")
-				{
-					star_index := strings.index(type, "*");
-					temp: [2]string;
-					temp[0], _ = strings.replace_all(type[star_index:], "*", "^");
-					temp[1] = type[:star_index - 1];
-
-					if temp[1] in types
-					{
-						temp[1] = types[temp[1]];
-					}
-
-					type = strings.concatenate(temp[:]);
-				}
-				type = strings.to_ada_case(type);
+				temp_name, _ := remove_all(name, ",");
+				final_type := type;
 
 				bracket_index := strings.index(temp_name, "[");
 				if bracket_index != -1
 				{
 					temp: [2]string;
-					temp[0] = strings.clone(temp_name[bracket_index:]);
-					temp[1] = strings.clone(type);
-					type = strings.concatenate(temp[:]);
+					temp[0] = temp_name[bracket_index:];
+					temp[1] = type;
+					final_type = concatenate(temp[:]);
 					temp_name = temp_name[:bracket_index];
 				}
 
-				field_info.type = type;
-				field_info.name = strings.to_snake_case(temp_name);
+				field_info.type = final_type;
+				field_info.name = to_snake_case(temp_name);
 				append(&current_struct.fields, field_info);
 			}
 		}
@@ -255,58 +239,63 @@ parse_structs :: proc(reader: ^bufio.Reader, structs: ^[dynamic]Struct_Info)
 
 generate_structs :: proc(file: os.Handle, structs: ^[dynamic]Struct_Info)
 {
+	using strings;
+
 	r_audio_buffer := "r_Audio_Buffer :: struct {};\n";
 	os.write(file, transmute([]u8)r_audio_buffer);
 
 	for struct_info in structs
 	{
-		struct_builder := strings.make_builder_none();
-		defer strings.destroy_builder(&struct_builder);
+		struct_builder := make_builder_none();
+		defer destroy_builder(&struct_builder);
 
-		strings.write_string_builder(&struct_builder, "\n");
-		strings.write_string_builder(&struct_builder, struct_info.name);
-		strings.write_string_builder(&struct_builder, " :: struct\n");
-		strings.write_string_builder(&struct_builder, "{\n");
+		write_string_builder(&struct_builder, "\n");
+		write_string_builder(&struct_builder, struct_info.name);
+		write_string_builder(&struct_builder, " :: struct\n");
+		write_string_builder(&struct_builder, "{\n");
 
 		for field_info in struct_info.fields
 		{
-			strings.write_string_builder(&struct_builder, "\t");
-			strings.write_string_builder(&struct_builder, field_info.name);
-			strings.write_string_builder(&struct_builder, ": ");
-			strings.write_string_builder(&struct_builder, field_info.type);
-			strings.write_string_builder(&struct_builder, ", //");
-			strings.write_string_builder(&struct_builder, field_info.comment);
-			strings.write_string_builder(&struct_builder, "\n");
+			write_string_builder(&struct_builder, "\t");
+			write_string_builder(&struct_builder, field_info.name);
+			write_string_builder(&struct_builder, ": ");
+			write_string_builder(&struct_builder, field_info.type);
+			write_string_builder(&struct_builder, ", //");
+			write_string_builder(&struct_builder, field_info.comment);
+			write_string_builder(&struct_builder, "\n");
 		}
 
-		strings.write_string_builder(&struct_builder, "};\n");
-		os.write(file, transmute([]u8)strings.to_string(struct_builder));
+		write_string_builder(&struct_builder, "};\n");
+		os.write(file, transmute([]u8)to_string(struct_builder));
 	}
 }
 
 parse_enums :: proc(reader: ^bufio.Reader, enums: ^[dynamic]Enum_Info)
 {
+	using strings;
+	using strconv;
+
 	ignore_line(reader);
 	line, err := bufio.reader_read_string(reader, '\n');
 
-	split := strings.split(strings.trim_space(line), " ");
-	enum_count, ok := strconv.parse_int(split[2]);
+	enum_string_header := split(trim_space(line), " ");
+	enum_count, ok := parse_int(enum_string_header[2]);
 	assert(ok);
 	ignore_line(reader);
 
 	for i in 0..<enum_count
 	{
 		line, err = bufio.reader_read_string(reader, '\n');
-		enum_string := strings.split(strings.trim_space(line), " ");
+		enum_string := split(trim_space(line), " ");
 		
 		index := 0;
-		index, ok = strconv.parse_int(enum_string[1][0:len(enum_string[1]) - 1]);
+		index, ok = parse_int(enum_string[1][0:len(enum_string[1]) - 1]);
 		assert(ok);
 
-		name := strings.to_ada_case(enum_string[2]);
+		name := to_ada_case(enum_string[2]);
 		
 		values_count := 0;
-		values_count, ok = strconv.parse_int(enum_string[3][1:]);
+		values_count, ok = parse_int(enum_string[3][1:]);
 		assert(ok);
 
 		values: [dynamic]Enum_Value_Info;
@@ -314,7 +303,7 @@ parse_enums :: proc(reader: ^bufio.Reader, enums: ^[dynamic]Enum_Info)
 		for j in 0..<values_count
 		{
 			line, err = bufio.reader_read_string(reader, '\n');
-			value_string := strings.split(strings.trim_space(line), " ");
+			value_string := split(trim_space(line), " ");
 			value_name := value_string[1][:len(value_string[1]) - 1];
 			value := value_string[2];
 			append(&current_enum.values, Enum_Value_Info{value_name, value});
@@ -325,41 +314,43 @@ parse_enums :: proc(reader: ^bufio.Reader, enums: ^[dynamic]Enum_Info)
 
 generate_enums :: proc(file: os.Handle, enums: ^[dynamic]Enum_Info)
 {
+	using strings;
+
 	for enum_info in enums
 	{
-		enum_builder := strings.make_builder_none();
-		defer strings.destroy_builder(&enum_builder);
+		enum_builder := make_builder_none();
+		defer destroy_builder(&enum_builder);
 
-		strings.write_string_builder(&enum_builder, "\n");
-		strings.write_string_builder(&enum_builder, enum_info.name);
-		strings.write_string_builder(&enum_builder, " :: enum\n");
-		strings.write_string_builder(&enum_builder, "{\n");
+		write_string_builder(&enum_builder, "\n");
+		write_string_builder(&enum_builder, enum_info.name);
+		write_string_builder(&enum_builder, " :: enum\n");
+		write_string_builder(&enum_builder, "{\n");
 
 		for value_info in enum_info.values
 		{
-			strings.write_string_builder(&enum_builder, "\t");
-			strings.write_string_builder(&enum_builder, value_info.string_value);
-			strings.write_string_builder(&enum_builder, " = ");
-			strings.write_string_builder(&enum_builder, value_info.int_value);
-			strings.write_string_builder(&enum_builder, ",\n");
-			// strings.write_string_builder(&enum_builder, field_info.comment);
-			// strings.write_string_builder(&enum_builder, "\n");
+			write_string_builder(&enum_builder, "\t");
+			write_string_builder(&enum_builder, value_info.string_value);
+			write_string_builder(&enum_builder, " = ");
+			write_string_builder(&enum_builder, value_info.int_value);
+			write_string_builder(&enum_builder, ",\n");
 		}
 
-		strings.write_string_builder(&enum_builder, "};\n");
-		os.write(file, transmute([]u8)strings.to_string(enum_builder));
+		write_string_builder(&enum_builder, "};\n");
+		os.write(file, transmute([]u8)to_string(enum_builder));
 	}
 }
 
 parse_type :: proc(type: string) -> string
 {
+	using strings;
+
 	parameter_type := type;
 
 	if parameter_type != "const char *"
 	{
 		ignored: bool;
-		parameter_type, ignored = strings.remove_all(parameter_type, "const");
-		parameter_type = strings.trim_space(parameter_type);		
+		parameter_type, ignored = remove_all(parameter_type, "const");
+		parameter_type = trim_space(parameter_type);		
 	}
 
 	if parameter_type in types
@@ -367,58 +358,62 @@ parse_type :: proc(type: string) -> string
 		parameter_type = types[parameter_type];
 	}
 	
-	if strings.contains(parameter_type, "*") && !strings.contains(parameter_type, "void")
+	if contains(parameter_type, "*") && !contains(parameter_type, "void")
 	{
-		star_index := strings.index(parameter_type, "*");
+		star_index := index(parameter_type, "*");
 		temp: [2]string;
-		temp[0], _ = strings.replace_all(parameter_type[star_index:], "*", "^");
+		temp[0], _ = replace_all(parameter_type[star_index:], "*", "^");
 		space := ' ';
 		if parameter_type[star_index] != cast(u8)space
 		{
 			star_index += 1;
 		}
-		temp[1] = strings.trim_space(parameter_type[:star_index - 1]);
+		temp[1] = trim_space(parameter_type[:star_index - 1]);
 		
 		if temp[1] in types
 		{
 			temp[1] = types[temp[1]];
 		}
 
-		parameter_type = strings.concatenate(temp[:]);
+		parameter_type = concatenate(temp[:]);
 	}
-	return strings.to_ada_case(parameter_type);
+
+	return to_ada_case(parameter_type);
 }
 
 parse_functions :: proc(reader: ^bufio.Reader, functions: ^[dynamic]Function_Info)
 {
+	using strings;
+	using strconv;
+
 	ignore_line(reader);
 	line, err := bufio.reader_read_string(reader, '\n');
 
-	split := strings.split(strings.trim_space(line), " ");
-	function_count, ok := strconv.parse_int(split[2]);
+	function_string_header := split(trim_space(line), " ");
+	function_count, ok := parse_int(function_string_header[2]);
 	assert(ok);
 	ignore_line(reader);
 
 	for i in 0..<function_count
 	{
 		line, err = bufio.reader_read_string(reader, '\n');
-		function_string := strings.split(strings.trim_space(line), " ");
+		function_string := split(trim_space(line), " ");
 		
 		index := 0;
-		index, ok = strconv.parse_int(function_string[1][0:len(function_string[1]) - 1]);
+		index, ok = parse_int(function_string[1][0:len(function_string[1]) - 1]);
 		assert(ok);
 
 		name := function_string[2][:len(function_string[2]) - 2];
 		
 		parameters_count := 0;
-		parameters_count, ok = strconv.parse_int(function_string[3][1:]);
+		parameters_count, ok = parse_int(function_string[3][1:]);
 		assert(ok);
 
 		line, err = bufio.reader_read_string(reader, '\n');
-		description := strings.trim_space(strings.split(line, "//")[1]);
+		description := trim_space(split(line, "//")[1]);
 
 		line, err = bufio.reader_read_string(reader, '\n');
-		return_type := parse_type(strings.join(strings.split(strings.trim_space(line), " ")[2:], " "));
+		return_type := parse_type(join(split(trim_space(line), " ")[2:], " "));
 
 		parameters: [dynamic]Parameter_Info;
 		current_function := Function_Info{name, description, return_type, parameters};
@@ -432,8 +427,8 @@ parse_functions :: proc(reader: ^bufio.Reader, functions: ^[dynamic]Function_Inf
 		{
 			
 			line, err = bufio.reader_read_string(reader, '\n');
-			parameter_string := strings.split(strings.trim_space(line), " ");
-			parameter_name := strings.to_snake_case(parameter_string[2]);
+			parameter_string := split(trim_space(line), " ");
+			parameter_name := to_snake_case(parameter_string[2]);
 			parameter_type: string;
 
 			if parameter_name == "dynamic"
@@ -443,12 +438,12 @@ parse_functions :: proc(reader: ^bufio.Reader, functions: ^[dynamic]Function_Inf
 			
 			if parameter_name == ""
 			{
-				parameter_name = "args";
+				parameter_name = "#c_vararg args";
 				parameter_type = "..any";
 			}
 			else
 			{
-				parameter_type = strings.join(parameter_string[4:], " ");
+				parameter_type = join(parameter_string[4:], " ");
 				parameter_type = parse_type(parameter_type[:len(parameter_type) - 1]);
 			}
 			
@@ -460,6 +455,7 @@ parse_functions :: proc(reader: ^bufio.Reader, functions: ^[dynamic]Function_Inf
 
 generate_functions :: proc(file: os.Handle, functions: ^[dynamic]Function_Info)
 {
+	using strings;
 	foreign_block := "\n@(default_calling_convention=\"c\")\nforeign raylib\n{\n";
 	os.write(file, transmute([]u8)foreign_block);
 
@@ -470,43 +466,43 @@ generate_functions :: proc(file: os.Handle, functions: ^[dynamic]Function_Info)
 			// Show cursor is colliding with another foreign function in user32.odin
 			continue;
 		}
-		function_builder := strings.make_builder_none();
-		defer strings.destroy_builder(&function_builder);
+		function_builder := make_builder_none();
+		defer destroy_builder(&function_builder);
 
-		strings.write_string_builder(&function_builder, "\n");
-		strings.write_string_builder(&function_builder, "\t// ");
-		strings.write_string_builder(&function_builder, function_info.description);
-		strings.write_string_builder(&function_builder, "\n");
+		write_string_builder(&function_builder, "\n");
+		write_string_builder(&function_builder, "\t// ");
+		write_string_builder(&function_builder, function_info.description);
+		write_string_builder(&function_builder, "\n");
 		
-		strings.write_string_builder(&function_builder, "\t@(link_name=\"");
-		strings.write_string_builder(&function_builder, function_info.name);
-		strings.write_string_builder(&function_builder, "\")\n\t");
-		strings.write_string_builder(&function_builder, strings.to_snake_case(function_info.name));
-		strings.write_string_builder(&function_builder, " :: proc(");
+		write_string_builder(&function_builder, "\t@(link_name=\"");
+		write_string_builder(&function_builder, function_info.name);
+		write_string_builder(&function_builder, "\")\n\t");
+		write_string_builder(&function_builder, to_snake_case(function_info.name));
+		write_string_builder(&function_builder, " :: proc(");
 
 		for parameter_info in function_info.parameters
 		{
-			strings.write_string_builder(&function_builder, parameter_info.name);
-			strings.write_string_builder(&function_builder, ": ");
-			strings.write_string_builder(&function_builder, parameter_info.type);
-			strings.write_string_builder(&function_builder, ", ");
+			write_string_builder(&function_builder, parameter_info.name);
+			write_string_builder(&function_builder, ": ");
+			write_string_builder(&function_builder, parameter_info.type);
+			write_string_builder(&function_builder, ", ");
 		}
 		if len(function_info.parameters) > 0
 		{
-			strings.pop_byte(&function_builder);
-			strings.pop_byte(&function_builder);
+			pop_byte(&function_builder);
+			pop_byte(&function_builder);
 		}
-		strings.write_string_builder(&function_builder, ") ");
+		write_string_builder(&function_builder, ") ");
 
 		if function_info.return_type != "void"
 		{
-			strings.write_string_builder(&function_builder, "-> ");
-			strings.write_string_builder(&function_builder, function_info.return_type);
-			strings.write_string_builder(&function_builder, " ");
+			write_string_builder(&function_builder, "-> ");
+			write_string_builder(&function_builder, function_info.return_type);
+			write_string_builder(&function_builder, " ");
 		}
-		strings.write_string_builder(&function_builder, "---;\n");
+		write_string_builder(&function_builder, "---;\n");
 
-		os.write(file, transmute([]u8)strings.to_string(function_builder));
+		os.write(file, transmute([]u8)to_string(function_builder));
 	}
 	block_end := "}\n";
 	os.write(file, transmute([]u8)block_end);

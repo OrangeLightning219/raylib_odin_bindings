@@ -1037,7 +1037,7 @@ foreign raylib
 
 	// Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 	@(link_name="TraceLog")
-	trace_log :: proc(log_level: int, text: cstring, args: ..any) ---;
+	trace_log :: proc(log_level: int, text: cstring, #c_vararg args: ..any) ---;
 
 	// Set the current threshold (minimum) log level
 	@(link_name="SetTraceLogLevel")
@@ -2017,7 +2017,7 @@ foreign raylib
 
 	// Text formatting with variables (sprintf style)
 	@(link_name="TextFormat")
-	text_format :: proc(text: cstring, args: ..any) -> cstring ---;
+	text_format :: proc(text: cstring, #c_vararg args: ..any) -> cstring ---;
 
 	// Get a piece of a text string
 	@(link_name="TextSubtext")
