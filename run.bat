@@ -16,7 +16,9 @@ cd %raylib_parser_path%
 %raylib_parser_path%/raylib_parser.exe > %binding_dir%/raylib/raylib_parser.output
 
 cd %binding_dir%/raylib
-del raylib.odin
+if exist raylib.odin (
+    del raylib.odin
+)
 nul > raylib.odin 2>NUL
 generate_raylib_bindings.exe < raylib_parser.output
 cd ..
