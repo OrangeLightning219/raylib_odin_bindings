@@ -13,12 +13,12 @@ if not exist %raylib_parser_path%/raylib_parser.exe (
 odin build generate_raylib_bindings.odin -out="raylib/generate_raylib_bindings.exe"
 
 cd %raylib_parser_path%
-%raylib_parser_path%/raylib_parser.exe > %binding_dir%/raylib/raylib_parser.output
+%raylib_parser_path%/raylib_parser.exe --json > %binding_dir%/raylib/raylib_parser.json
 
 cd %binding_dir%/raylib
 if exist raylib.odin (
     del raylib.odin
 )
 nul > raylib.odin 2>NUL
-generate_raylib_bindings.exe < raylib_parser.output
+generate_raylib_bindings.exe
 cd ..

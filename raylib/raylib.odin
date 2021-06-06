@@ -91,7 +91,7 @@ Color :: struct
 
 Rectangle :: struct
 {
-	x: f32, // Rectangle top-left corner position x
+	x: f32, // Rectangle top-left corner position x 
 	y: f32, // Rectangle top-left corner position y
 	width: f32, // Rectangle width
 	height: f32, // Rectangle height
@@ -1087,7 +1087,7 @@ foreign raylib
 	@(link_name="SaveFileData")
 	save_file_data :: proc(file_name: cstring, data: rawptr, bytes_to_write: u32) -> bool ---;
 
-	// Load text data from file (read), returns a '\0' terminated string
+	// Load text data from file (read), returns a ' 0' terminated string
 	@(link_name="LoadFileText")
 	load_file_text :: proc(file_name: cstring) -> ^u8 ---;
 
@@ -1095,7 +1095,7 @@ foreign raylib
 	@(link_name="UnloadFileText")
 	unload_file_text :: proc(text: ^u8) ---;
 
-	// Save text data to file (write), string must be '\0' terminated, returns true on success
+	// Save text data to file (write), string must be ' 0' terminated, returns true on success
 	@(link_name="SaveFileText")
 	save_file_text :: proc(file_name: cstring, text: ^u8) -> bool ---;
 
@@ -1403,7 +1403,7 @@ foreign raylib
 	@(link_name="DrawLineBezier")
 	draw_line_bezier :: proc(start_pos: Vector2, end_pos: Vector2, thick: f32, color: Color) ---;
 
-	// Draw line using quadratic bezier curves with a control point
+	// raw line using quadratic bezier curves with a control point
 	@(link_name="DrawLineBezierQuad")
 	draw_line_bezier_quad :: proc(start_pos: Vector2, end_pos: Vector2, control_pos: Vector2, thick: f32, color: Color) ---;
 
@@ -2011,7 +2011,7 @@ foreign raylib
 	@(link_name="TextIsEqual")
 	text_is_equal :: proc(text1: cstring, text2: cstring) -> bool ---;
 
-	// Get text length, checks for '\0' ending
+	// Get text length, checks for ' 0' ending
 	@(link_name="TextLength")
 	text_length :: proc(text: cstring) -> u32 ---;
 
@@ -2339,21 +2339,21 @@ foreign raylib
 	@(link_name="GetRayCollisionBox")
 	get_ray_collision_box :: proc(ray: Ray, box: Bounding_Box) -> Ray_Collision ---;
 
-	// Get collision info between ray and mesh
-	@(link_name="GetRayCollisionMesh")
-	get_ray_collision_mesh :: proc(ray: Ray, mesh: Mesh, transform: Matrix) -> Ray_Collision ---;
-
 	// Get collision info between ray and model
 	@(link_name="GetRayCollisionModel")
 	get_ray_collision_model :: proc(ray: Ray, model: Model) -> Ray_Collision ---;
+
+	// Get collision info between ray and mesh
+	@(link_name="GetRayCollisionMesh")
+	get_ray_collision_mesh :: proc(ray: Ray, mesh: Mesh, transform: Matrix) -> Ray_Collision ---;
 
 	// Get collision info between ray and triangle
 	@(link_name="GetRayCollisionTriangle")
 	get_ray_collision_triangle :: proc(ray: Ray, p1: Vector3, p2: Vector3, p3: Vector3) -> Ray_Collision ---;
 
-	// Get collision info between ray and ground plane (Y-normal plane)
-	@(link_name="GetRayCollisionGround")
-	get_ray_collision_ground :: proc(ray: Ray, ground_height: f32) -> Ray_Collision ---;
+	// Get collision info between ray and quad
+	@(link_name="GetRayCollisionQuad")
+	get_ray_collision_quad :: proc(ray: Ray, p1: Vector3, p2: Vector3, p3: Vector3, p4: Vector3) -> Ray_Collision ---;
 
 	// Initialize audio device and context
 	@(link_name="InitAudioDevice")
@@ -2519,17 +2519,17 @@ foreign raylib
 	@(link_name="GetMusicTimePlayed")
 	get_music_time_played :: proc(music: Music) -> f32 ---;
 
-	// Init audio stream (to stream raw audio pcm data)
-	@(link_name="InitAudioStream")
-	init_audio_stream :: proc(sample_rate: u32, sample_size: u32, channels: u32) -> Audio_Stream ---;
+	// Load audio stream (to stream raw audio pcm data)
+	@(link_name="LoadAudioStream")
+	load_audio_stream :: proc(sample_rate: u32, sample_size: u32, channels: u32) -> Audio_Stream ---;
+
+	// Unload audio stream and free memory
+	@(link_name="UnloadAudioStream")
+	unload_audio_stream :: proc(stream: Audio_Stream) ---;
 
 	// Update audio stream buffers with data
 	@(link_name="UpdateAudioStream")
 	update_audio_stream :: proc(stream: Audio_Stream, data: rawptr, samples_count: int) ---;
-
-	// Close audio stream and free memory
-	@(link_name="CloseAudioStream")
-	close_audio_stream :: proc(stream: Audio_Stream) ---;
 
 	// Check if any audio stream buffers requires refill
 	@(link_name="IsAudioStreamProcessed")

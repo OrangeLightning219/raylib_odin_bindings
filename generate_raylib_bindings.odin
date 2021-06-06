@@ -2,50 +2,11 @@ package raylib_bindings
 
 import "core:fmt"
 import "core:os"
-import "core:io"
 import "core:bufio"
 import "core:strings"
 import "core:strconv"
 import "core:builtin"
-
-Parameter_Info :: struct
-{
-	name: string,
-	type: string,
-};
-
-Function_Info :: struct
-{
-	name: string,
-	description: string,
-	return_type: string,
-	parameters: [dynamic]Parameter_Info,
-};
-
-Enum_Value_Info :: struct
-{
-	string_value: string,
-	int_value: string,
-};
-
-Enum_Info :: struct 
-{
-	name: string,
-	values: [dynamic]Enum_Value_Info,
-};
-
-Field_Info :: struct
-{
-	type: string,
-	name: string,
-	comment: string,
-};
-
-Struct_Info :: struct
-{
-	name: string,
-	fields: [dynamic]Field_Info,
-};
+import "core:encoding/json"
 
 ignore_line :: proc(reader: ^bufio.Reader)
 {
@@ -73,6 +34,47 @@ types := map[string]string{
 	"const char *" = "cstring",
 	"char **" = "^cstring",
 };
+
+parse_type :: proc(type: string) -> string
+{
+	using strings;
+
+	parameter_type := type;
+
+	if parameter_type != "const char *"
+	{
+		ignored: bool;
+		parameter_type, ignored = remove_all(parameter_type, "const");
+		parameter_type = trim_space(parameter_type);		
+	}
+
+	if parameter_type in types
+	{
+		parameter_type = types[parameter_type];
+	}
+	
+	if contains(parameter_type, "*") && !contains(parameter_type, "void")
+	{
+		star_index := index(parameter_type, "*");
+		temp: [2]string;
+		temp[0], _ = replace_all(parameter_type[star_index:], "*", "^");
+		space := ' ';
+		if parameter_type[star_index] != cast(u8)space
+		{
+			star_index += 1;
+		}
+		temp[1] = trim_space(parameter_type[:star_index - 1]);
+		
+		if temp[1] in types
+		{
+			temp[1] = types[temp[1]];
+		}
+
+		parameter_type = concatenate(temp[:]);
+	}
+
+	return to_ada_case(parameter_type);
+}
 
 generate_typedefs :: proc(file: os.Handle)
 {
@@ -144,125 +146,57 @@ generate_typedefs :: proc(file: os.Handle)
 
 }
 
-parse_structs :: proc(reader: ^bufio.Reader, structs: ^[dynamic]Struct_Info)
-{
-	using strings;
-	using strconv;
-
-	ignore_line(reader);
-	line, err := bufio.reader_read_string(reader, '\n');
-
-	struct_string_header := split(trim_space(line), " ");
-	struct_count, ok := parse_int(struct_string_header[2]);
-	assert(ok);
-	ignore_line(reader);
-
-	for i in 0..<struct_count
-	{
-		line, err = bufio.reader_read_string(reader, '\n');
-		struct_string := split(trim_space(line), " ");
-		
-		index := 0;
-		index, ok = parse_int(struct_string[1][0:len(struct_string[1]) - 1]);
-		assert(ok);
-
-		name := to_ada_case(struct_string[2]);
-		
-		fields_count := 0;
-		fields_count, ok = parse_int(struct_string[3][1:]);
-		assert(ok);
-
-		fields: [dynamic]Field_Info;
-		current_struct := Struct_Info{name, fields};
-
-		for j in 0..<fields_count
-		{
-			line, err = bufio.reader_read_string(reader, '\n');
-			line = trim_space(line);
-
-			field_with_comment := split(line, "//");
-			
-			comment := field_with_comment[1];
-			field_string := split(trim_space(field_with_comment[0]), " ");
-			type := "";
-			names: []string;
-			if field_string[2] == "unsigned"
-			{
-				join_index := 4;
-				if contains(field_string[4], "*")
-				{
-					join_index = 5;
-				}
-				type = join(field_string[2:join_index], " ");
-				names = field_string[join_index:];
-			}
-			else 
-			{
-				if contains(field_string[3], "*") 
-				{
-					type = join(field_string[2:4], " ");
-					names = field_string[4:];
-				}
-				else
-				{
-					type = field_string[2];
-					names = field_string[3:];
-				}
-			}
-
-			type = parse_type(type);
-			for name in names
-			{
-				field_info: Field_Info;
-				field_info.comment = comment;
-				temp_name, _ := remove_all(name, ",");
-				final_type := type;
-
-				bracket_index := strings.index(temp_name, "[");
-				if bracket_index != -1
-				{
-					temp: [2]string;
-					temp[0] = temp_name[bracket_index:];
-					temp[1] = type;
-					final_type = concatenate(temp[:]);
-					temp_name = temp_name[:bracket_index];
-				}
-
-				field_info.type = final_type;
-				field_info.name = to_snake_case(temp_name);
-				append(&current_struct.fields, field_info);
-			}
-		}
-		append(structs, current_struct);
-	}
-}
-
-generate_structs :: proc(file: os.Handle, structs: ^[dynamic]Struct_Info)
+generate_structs :: proc(file: os.Handle, structs_json: json.Array)
 {
 	using strings;
 
 	r_audio_buffer := "r_Audio_Buffer :: struct {};\n";
 	os.write(file, transmute([]u8)r_audio_buffer);
 
-	for struct_info in structs
+	for s in structs_json
 	{
 		struct_builder := make_builder_none();
 		defer destroy_builder(&struct_builder);
-
+		
+		struct_name := s.value.(json.Object)["name"].value.(json.String);
+		fields := s.value.(json.Object)["fields"].value.(json.Array);
+		
 		write_string_builder(&struct_builder, "\n");
-		write_string_builder(&struct_builder, struct_info.name);
+		write_string_builder(&struct_builder, to_ada_case(struct_name));
 		write_string_builder(&struct_builder, " :: struct\n");
 		write_string_builder(&struct_builder, "{\n");
 
-		for field_info in struct_info.fields
+		for field in fields
 		{
-			write_string_builder(&struct_builder, "\t");
-			write_string_builder(&struct_builder, field_info.name);
-			write_string_builder(&struct_builder, ": ");
-			write_string_builder(&struct_builder, field_info.type);
-			write_string_builder(&struct_builder, ", //");
-			write_string_builder(&struct_builder, field_info.comment);
-			write_string_builder(&struct_builder, "\n");
+			field_name := field.value.(json.Object)["name"].value.(json.String);
+			field_type := field.value.(json.Object)["type"].value.(json.String);
+			field_desc := field.value.(json.Object)["description"].value.(json.String);
+
+			field_type = parse_type(field_type);
+			names := split(field_name, " ");
+			for name in names
+			{
+				temp_name, _ := remove_all(name, ",");
+				final_type := field_type;
+
+				bracket_index := strings.index(temp_name, "[");
+				if bracket_index != -1
+				{
+					temp: [2]string;
+					temp[0] = temp_name[bracket_index:];
+					temp[1] = field_type;
+					final_type = concatenate(temp[:]);
+					temp_name = temp_name[:bracket_index];
+				}
+
+				write_string_builder(&struct_builder, "\t");
+				write_string_builder(&struct_builder, to_snake_case(temp_name));
+				write_string_builder(&struct_builder, ": ");
+				write_string_builder(&struct_builder, final_type);
+				write_string_builder(&struct_builder, ", // ");
+				write_string_builder(&struct_builder, field_desc);
+				write_string_builder(&struct_builder, "\n");
+			}
 		}
 
 		write_string_builder(&struct_builder, "};\n");
@@ -270,68 +204,32 @@ generate_structs :: proc(file: os.Handle, structs: ^[dynamic]Struct_Info)
 	}
 }
 
-parse_enums :: proc(reader: ^bufio.Reader, enums: ^[dynamic]Enum_Info)
-{
-	using strings;
-	using strconv;
-
-	ignore_line(reader);
-	line, err := bufio.reader_read_string(reader, '\n');
-
-	enum_string_header := split(trim_space(line), " ");
-	enum_count, ok := parse_int(enum_string_header[2]);
-	assert(ok);
-	ignore_line(reader);
-
-	for i in 0..<enum_count
-	{
-		line, err = bufio.reader_read_string(reader, '\n');
-		enum_string := split(trim_space(line), " ");
-		
-		index := 0;
-		index, ok = parse_int(enum_string[1][0:len(enum_string[1]) - 1]);
-		assert(ok);
-
-		name := to_ada_case(enum_string[2]);
-		
-		values_count := 0;
-		values_count, ok = parse_int(enum_string[3][1:]);
-		assert(ok);
-
-		values: [dynamic]Enum_Value_Info;
-		current_enum := Enum_Info{name, values};
-		for j in 0..<values_count
-		{
-			line, err = bufio.reader_read_string(reader, '\n');
-			value_string := split(trim_space(line), " ");
-			value_name := value_string[1][:len(value_string[1]) - 1];
-			value := value_string[2];
-			append(&current_enum.values, Enum_Value_Info{value_name, value});
-		}
-		append(enums, current_enum);
-	}
-}
-
-generate_enums :: proc(file: os.Handle, enums: ^[dynamic]Enum_Info)
+generate_enums :: proc(file: os.Handle, enums_json: json.Array)
 {
 	using strings;
 
-	for enum_info in enums
+	for e in enums_json
 	{
 		enum_builder := make_builder_none();
 		defer destroy_builder(&enum_builder);
 
+		enum_name := e.value.(json.Object)["name"].value.(json.String);
+		values := e.value.(json.Object)["values"].value.(json.Array);
+
 		write_string_builder(&enum_builder, "\n");
-		write_string_builder(&enum_builder, enum_info.name);
+		write_string_builder(&enum_builder, to_ada_case(enum_name));
 		write_string_builder(&enum_builder, " :: enum\n");
 		write_string_builder(&enum_builder, "{\n");
 
-		for value_info in enum_info.values
+		for value in values
 		{
+			value_name := value.value.(json.Object)["name"].value.(json.String);
+			enum_value := value.value.(json.Object)["value"].value.(json.Integer);
 			write_string_builder(&enum_builder, "\t");
-			write_string_builder(&enum_builder, value_info.string_value);
+			write_string_builder(&enum_builder, value_name);
 			write_string_builder(&enum_builder, " = ");
-			write_string_builder(&enum_builder, value_info.int_value);
+			buf: [10]byte;
+			write_string_builder(&enum_builder, strconv.itoa(buf[:], cast(int)enum_value));
 			write_string_builder(&enum_builder, ",\n");
 		}
 
@@ -340,128 +238,17 @@ generate_enums :: proc(file: os.Handle, enums: ^[dynamic]Enum_Info)
 	}
 }
 
-parse_type :: proc(type: string) -> string
-{
-	using strings;
-
-	parameter_type := type;
-
-	if parameter_type != "const char *"
-	{
-		ignored: bool;
-		parameter_type, ignored = remove_all(parameter_type, "const");
-		parameter_type = trim_space(parameter_type);		
-	}
-
-	if parameter_type in types
-	{
-		parameter_type = types[parameter_type];
-	}
-	
-	if contains(parameter_type, "*") && !contains(parameter_type, "void")
-	{
-		star_index := index(parameter_type, "*");
-		temp: [2]string;
-		temp[0], _ = replace_all(parameter_type[star_index:], "*", "^");
-		space := ' ';
-		if parameter_type[star_index] != cast(u8)space
-		{
-			star_index += 1;
-		}
-		temp[1] = trim_space(parameter_type[:star_index - 1]);
-		
-		if temp[1] in types
-		{
-			temp[1] = types[temp[1]];
-		}
-
-		parameter_type = concatenate(temp[:]);
-	}
-
-	return to_ada_case(parameter_type);
-}
-
-parse_functions :: proc(reader: ^bufio.Reader, functions: ^[dynamic]Function_Info)
-{
-	using strings;
-	using strconv;
-
-	ignore_line(reader);
-	line, err := bufio.reader_read_string(reader, '\n');
-
-	function_string_header := split(trim_space(line), " ");
-	function_count, ok := parse_int(function_string_header[2]);
-	assert(ok);
-	ignore_line(reader);
-
-	for i in 0..<function_count
-	{
-		line, err = bufio.reader_read_string(reader, '\n');
-		function_string := split(trim_space(line), " ");
-		
-		index := 0;
-		index, ok = parse_int(function_string[1][0:len(function_string[1]) - 1]);
-		assert(ok);
-
-		name := function_string[2][:len(function_string[2]) - 2];
-		
-		parameters_count := 0;
-		parameters_count, ok = parse_int(function_string[3][1:]);
-		assert(ok);
-
-		line, err = bufio.reader_read_string(reader, '\n');
-		description := trim_space(split(line, "//")[1]);
-
-		line, err = bufio.reader_read_string(reader, '\n');
-		return_type := parse_type(join(split(trim_space(line), " ")[2:], " "));
-
-		parameters: [dynamic]Parameter_Info;
-		current_function := Function_Info{name, description, return_type, parameters};
-
-		if parameters_count == 0
-		{
-			ignore_line(reader);
-		}
-
-		for j in 0..<parameters_count
-		{
-			
-			line, err = bufio.reader_read_string(reader, '\n');
-			parameter_string := split(trim_space(line), " ");
-			parameter_name := to_snake_case(parameter_string[2]);
-			parameter_type: string;
-
-			if parameter_name == "dynamic"
-			{
-				parameter_name = "_dynamic";
-			} 
-			
-			if parameter_name == ""
-			{
-				parameter_name = "#c_vararg args";
-				parameter_type = "..any";
-			}
-			else
-			{
-				parameter_type = join(parameter_string[4:], " ");
-				parameter_type = parse_type(parameter_type[:len(parameter_type) - 1]);
-			}
-			
-			append(&current_function.parameters, Parameter_Info{parameter_name, parameter_type});
-		}
-		append(functions, current_function);
-	}
-}
-
-generate_functions :: proc(file: os.Handle, functions: ^[dynamic]Function_Info)
+generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 {
 	using strings;
 	foreign_block := "\n@(default_calling_convention=\"c\")\nforeign raylib\n{\n";
 	os.write(file, transmute([]u8)foreign_block);
 
-	for function_info in functions
+	for f in functions_json
 	{
-		if function_info.name == "ShowCursor"
+		function_name := f.value.(json.Object)["name"].value.(json.String);
+
+		if function_name == "ShowCursor"
 		{
 			// Show cursor is colliding with another foreign function in user32.odin
 			continue;
@@ -469,35 +256,60 @@ generate_functions :: proc(file: os.Handle, functions: ^[dynamic]Function_Info)
 		function_builder := make_builder_none();
 		defer destroy_builder(&function_builder);
 
+		function_desc := f.value.(json.Object)["description"].value.(json.String);
+
 		write_string_builder(&function_builder, "\n");
 		write_string_builder(&function_builder, "\t// ");
-		write_string_builder(&function_builder, function_info.description);
+		write_string_builder(&function_builder, function_desc);
 		write_string_builder(&function_builder, "\n");
 		
 		write_string_builder(&function_builder, "\t@(link_name=\"");
-		write_string_builder(&function_builder, function_info.name);
+		write_string_builder(&function_builder, function_name);
 		write_string_builder(&function_builder, "\")\n\t");
-		write_string_builder(&function_builder, to_snake_case(function_info.name));
+		write_string_builder(&function_builder, to_snake_case(function_name));
 		write_string_builder(&function_builder, " :: proc(");
 
-		for parameter_info in function_info.parameters
+		has_params := f.value.(json.Object)["params"].value != nil;
+		if has_params
 		{
-			write_string_builder(&function_builder, parameter_info.name);
-			write_string_builder(&function_builder, ": ");
-			write_string_builder(&function_builder, parameter_info.type);
-			write_string_builder(&function_builder, ", ");
-		}
-		if len(function_info.parameters) > 0
-		{
-			pop_byte(&function_builder);
-			pop_byte(&function_builder);
-		}
-		write_string_builder(&function_builder, ") ");
+			parameters := f.value.(json.Object)["params"].value.(json.Object);
+			for parameter_name, param_type in parameters
+			{
+				param_name := parameter_name;
+				type := param_type.value.(json.String);
 
-		if function_info.return_type != "void"
+				if param_name == "dynamic"
+				{
+					param_name = "_dynamic";
+				} 
+				else if param_name == ""
+				{
+					param_name = "#c_vararg args";
+					type = "..any";
+				}
+				else
+				{
+					param_name = to_snake_case(parameter_name);
+					type = parse_type(type);
+				}
+
+				write_string_builder(&function_builder, param_name);
+				write_string_builder(&function_builder, ": ");
+				write_string_builder(&function_builder, type);
+				write_string_builder(&function_builder, ", ");
+			}
+			pop_byte(&function_builder);
+			pop_byte(&function_builder);
+		}
+		
+		write_string_builder(&function_builder, ") ");
+		
+		return_type := parse_type(f.value.(json.Object)["returnType"].value.(json.String));
+
+		if return_type != "void"
 		{
 			write_string_builder(&function_builder, "-> ");
-			write_string_builder(&function_builder, function_info.return_type);
+			write_string_builder(&function_builder, return_type);
 			write_string_builder(&function_builder, " ");
 		}
 		write_string_builder(&function_builder, "---;\n");
@@ -511,17 +323,14 @@ generate_functions :: proc(file: os.Handle, functions: ^[dynamic]Function_Info)
 main ::proc()
 {
 	defer delete(types);
-	input_stream := os.stream_from_handle(os.stdin);
-	reader: bufio.Reader;
-	bufio.reader_init(&reader, io.Reader{input_stream});
 
-	structs: [dynamic]Struct_Info;
-	enums: [dynamic]Enum_Info;
-	functions: [dynamic]Function_Info;
-
-	parse_structs(&reader, &structs);
-	parse_enums(&reader, &enums);
-	parse_functions(&reader, &functions);
+	bytes, ok := os.read_entire_file("raylib_parser.json");
+	
+	raylib_json, parsed := json.parse(bytes, json.Specification.JSON, true);
+	
+	structs_json := raylib_json.value.(json.Object)["structs"].value.(json.Array);
+	enums_json := raylib_json.value.(json.Object)["enums"].value.(json.Array);
+	functions_json := raylib_json.value.(json.Object)["functions"].value.(json.Array);
 
 	file, error := os.open("./raylib.odin", os.O_RDWR);
 	assert(error == 0);
@@ -531,7 +340,7 @@ main ::proc()
 	os.write(file, transmute([]u8)header);
 
 	generate_typedefs(file);
-	generate_structs(file, &structs);
-	generate_enums(file, &enums);
-	generate_functions(file, &functions);
+	generate_structs(file, structs_json);
+	generate_enums(file, enums_json);
+	generate_functions(file, functions_json);
 }
