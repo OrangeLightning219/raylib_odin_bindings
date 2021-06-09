@@ -37,7 +37,7 @@ If you want to update the bindings yourself there are some additional requiremen
 * Visual Studio 2017 or 2019
 * x64 Native Tools Command Prompt for VS running
 * Raylib version 3.8+ with the raylib parser built and named `raylib_parser.exe`
-* `raylib.dll` and `raylib.lib` built following these [insturctions](https://github.com/raysan5/raylib/wiki/Create-Visual-Studio-2019-Project) and copied to the `raylib` folder
+* `raylib.dll` and `raylib.lib` built following these [instructions](https://github.com/raysan5/raylib/wiki/Create-Visual-Studio-2019-Project) and copied to the `raylib` folder
 * Odin [built](https://odin-lang.org/docs/install/) and added to your PATH
 
 To generate the bindings execute `run.bat` with a path pointing to the raylib parser folder. For example `run.bat c:\raylib\parser`.
