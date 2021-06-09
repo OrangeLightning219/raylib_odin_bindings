@@ -20,7 +20,7 @@ main :: proc()
     using rl;
     // Initialization
     //--------------------------------------------------------------------------------------
-    screen_width ::  1920;
+    screen_width  :: 1920;
     screen_height :: 1080;
 
     init_window(screen_width, screen_height, "raylib [textures] example - bunnymark");
@@ -50,12 +50,12 @@ main :: proc()
                 if bunnies_count < MAX_BUNNIES
                 {
                     bunnies[bunnies_count].position = get_mouse_position();
-                    bunnies[bunnies_count].speed.x = cast(f32)get_random_value(-250, 250)/60.0;
-                    bunnies[bunnies_count].speed.y = cast(f32)get_random_value(-250, 250)/60.0;
-                    bunnies[bunnies_count].color = Color{ cast(u8) get_random_value(50, 240),
-                                                          cast(u8) get_random_value(80, 240),
-                                                          cast(u8) get_random_value(100, 240), 
-                                                          255 };
+                    bunnies[bunnies_count].speed.x  = cast(f32)get_random_value(-250, 250)/60.0;
+                    bunnies[bunnies_count].speed.y  = cast(f32)get_random_value(-250, 250)/60.0;
+                    bunnies[bunnies_count].color    = Color{ cast(u8) get_random_value(50, 240),
+                                                             cast(u8) get_random_value(80, 240),
+                                                             cast(u8) get_random_value(100, 240), 
+                                                             255 };
                     bunnies_count += 1;
                 }
             }
@@ -95,9 +95,9 @@ main :: proc()
             draw_texture(tex_bunny, cast(i32)bunnies[i].position.x, cast(i32)bunnies[i].position.y, bunnies[i].color);
         }
 
-        draw_rectangle(0, 0, screen_width, 40, BLACK); //BLACK
-        draw_text(text_format("bunnies: %i", bunnies_count), 120, 10, 20, GREEN); //GREEN
-        draw_text(text_format("batched draw calls: %i", 1 + bunnies_count/MAX_BATCH_ELEMENTS), 320, 10, 20, MAROON); //MAROON
+        draw_rectangle(0, 0, screen_width, 40, BLACK);
+        draw_text(text_format("bunnies: %i", bunnies_count), 120, 10, 20, GREEN);
+        draw_text(text_format("batched draw calls: %i", 1 + bunnies_count/MAX_BATCH_ELEMENTS), 320, 10, 20, MAROON);
 
         draw_fps(10, 10);
 
