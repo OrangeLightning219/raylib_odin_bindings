@@ -6,8 +6,8 @@ main :: proc()
     using rl;
     // Initialization
     //--------------------------------------------------------------------------------------
-    screen_width := 800;
-    screen_height := 450;
+    screen_width ::  800;
+    screen_height :: 450;
 
     init_window(screen_width, screen_height, "raylib [core] example - basic window");
     set_target_fps(60);               // Set our game to run at 60 frames-per-second

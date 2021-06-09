@@ -100,19 +100,19 @@ Rectangle :: struct
 Image :: struct
 {
 	data: rawptr, // Image raw data
-	width: int, // Image base width
-	height: int, // Image base height
-	mipmaps: int, // Mipmap levels, 1 by default
-	format: int, // Data format (PixelFormat type)
+	width: i32, // Image base width
+	height: i32, // Image base height
+	mipmaps: i32, // Mipmap levels, 1 by default
+	format: i32, // Data format (PixelFormat type)
 };
 
 Texture :: struct
 {
 	id: u32, // OpenGL texture id
-	width: int, // Texture base width
-	height: int, // Texture base height
-	mipmaps: int, // Mipmap levels, 1 by default
-	format: int, // Data format (PixelFormat type)
+	width: i32, // Texture base width
+	height: i32, // Texture base height
+	mipmaps: i32, // Mipmap levels, 1 by default
+	format: i32, // Data format (PixelFormat type)
 };
 
 Render_Texture :: struct
@@ -125,27 +125,27 @@ Render_Texture :: struct
 N_Patch_Info :: struct
 {
 	source: Rectangle, // Texture source rectangle
-	left: int, // Left border offset
-	top: int, // Top border offset
-	right: int, // Right border offset
-	bottom: int, // Bottom border offset
-	layout: int, // Layout of the n-patch: 3x3, 1x3 or 3x1
+	left: i32, // Left border offset
+	top: i32, // Top border offset
+	right: i32, // Right border offset
+	bottom: i32, // Bottom border offset
+	layout: i32, // Layout of the n-patch: 3x3, 1x3 or 3x1
 };
 
 Char_Info :: struct
 {
-	value: int, // Character value (Unicode)
-	offset_x: int, // Character offset X when drawing
-	offset_y: int, // Character offset Y when drawing
-	advance_x: int, // Character advance position X
+	value: i32, // Character value (Unicode)
+	offset_x: i32, // Character offset X when drawing
+	offset_y: i32, // Character offset Y when drawing
+	advance_x: i32, // Character advance position X
 	image: Image, // Character image data
 };
 
 Font :: struct
 {
-	base_size: int, // Base size (default chars height)
-	chars_count: int, // Number of characters
-	chars_padding: int, // Padding around the chars
+	base_size: i32, // Base size (default chars height)
+	chars_count: i32, // Number of characters
+	chars_padding: i32, // Padding around the chars
 	texture: Texture2d, // Characters texture atlas
 	recs: ^Rectangle, // Characters rectangles in texture
 	chars: ^Char_Info, // Characters info data
@@ -157,7 +157,7 @@ Camera3d :: struct
 	target: Vector3, // Camera target it looks-at
 	up: Vector3, // Camera up vector (rotation over its axis)
 	fovy: f32, // Camera field-of-view apperture in Y (degrees) in perspective, used as near plane width in orthographic
-	projection: int, // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
+	projection: i32, // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
 };
 
 Camera2d :: struct
@@ -170,8 +170,8 @@ Camera2d :: struct
 
 Mesh :: struct
 {
-	vertex_count: int, // Number of vertices stored in arrays
-	triangle_count: int, // Number of triangles stored (indexed or not)
+	vertex_count: i32, // Number of vertices stored in arrays
+	triangle_count: i32, // Number of triangles stored (indexed or not)
 	vertices: ^f32, // Vertex position (XYZ - 3 components per vertex) (shader-location = 0)
 	texcoords: ^f32, // Vertex texture coordinates (UV - 2 components per vertex) (shader-location = 1)
 	texcoords2: ^f32, // Vertex second texture coordinates (useful for lightmaps) (shader-location = 5)
@@ -181,7 +181,7 @@ Mesh :: struct
 	indices: ^u16, // Vertex indices (in case vertex data comes indexed)
 	anim_vertices: ^f32, // Animated vertex positions (after bones transformations)
 	anim_normals: ^f32, // Animated normals (after bones transformations)
-	bone_ids: ^int, // Vertex bone ids, up to 4 bones influence by vertex (skinning)
+	bone_ids: ^i32, // Vertex bone ids, up to 4 bones influence by vertex (skinning)
 	bone_weights: ^f32, // Vertex bone weight, up to 4 bones influence by vertex (skinning)
 	vao_id: u32, // OpenGL Vertex Array Object id
 	vbo_id: ^u32, // OpenGL Vertex Buffer Objects id (default vertex data)
@@ -190,7 +190,7 @@ Mesh :: struct
 Shader :: struct
 {
 	id: u32, // Shader program id
-	locs: ^int, // Shader locations array (MAX_SHADER_LOCATIONS)
+	locs: ^i32, // Shader locations array (MAX_SHADER_LOCATIONS)
 };
 
 Material_Map :: struct
@@ -217,26 +217,26 @@ Transform :: struct
 Bone_Info :: struct
 {
 	name: [32]u8, // Bone name
-	parent: int, // Bone parent
+	parent: i32, // Bone parent
 };
 
 Model :: struct
 {
 	transform: Matrix, // Local transform matrix
-	mesh_count: int, // Number of meshes
-	material_count: int, // Number of materials
+	mesh_count: i32, // Number of meshes
+	material_count: i32, // Number of materials
 	meshes: ^Mesh, // Meshes array
 	materials: ^Material, // Materials array
-	mesh_material: ^int, // Mesh material number
-	bone_count: int, // Number of bones
+	mesh_material: ^i32, // Mesh material number
+	bone_count: i32, // Number of bones
 	bones: ^Bone_Info, // Bones information (skeleton)
 	bind_pose: ^Transform, // Bones base transformation (pose)
 };
 
 Model_Animation :: struct
 {
-	bone_count: int, // Number of bones
-	frame_count: int, // Number of animation frames
+	bone_count: i32, // Number of bones
+	frame_count: i32, // Number of animation frames
 	bones: ^Bone_Info, // Bones information (skeleton)
 	frame_poses: ^^Transform, // Poses array by frame
 };
@@ -289,14 +289,14 @@ Music :: struct
 	stream: Audio_Stream, // Audio stream
 	sample_count: u32, // Total number of samples
 	looping: bool, // Music looping enable
-	ctx_type: int, // Type of music context (audio filetype)
+	ctx_type: i32, // Type of music context (audio filetype)
 	ctx_data: rawptr, // Audio context data, depends on type
 };
 
 Vr_Device_Info :: struct
 {
-	h_resolution: int, // Horizontal resolution in pixels
-	v_resolution: int, // Vertical resolution in pixels
+	h_resolution: i32, // Horizontal resolution in pixels
+	v_resolution: i32, // Vertical resolution in pixels
 	h_screen_size: f32, // Horizontal size in meters
 	v_screen_size: f32, // Vertical size in meters
 	v_screen_center: f32, // Screen center in meters
@@ -693,7 +693,7 @@ foreign raylib
 
 	// Initialize window and OpenGL context
 	@(link_name="InitWindow")
-	init_window :: proc(width: int, height: int, title: cstring) ---;
+	init_window :: proc(width: i32, height: i32, title: cstring) ---;
 
 	// Check if KEY_ESCAPE pressed or Close icon pressed
 	@(link_name="WindowShouldClose")
@@ -769,19 +769,19 @@ foreign raylib
 
 	// Set window position on screen (only PLATFORM_DESKTOP)
 	@(link_name="SetWindowPosition")
-	set_window_position :: proc(x: int, y: int) ---;
+	set_window_position :: proc(x: i32, y: i32) ---;
 
 	// Set monitor for the current window (fullscreen mode)
 	@(link_name="SetWindowMonitor")
-	set_window_monitor :: proc(monitor: int) ---;
+	set_window_monitor :: proc(monitor: i32) ---;
 
 	// Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
 	@(link_name="SetWindowMinSize")
-	set_window_min_size :: proc(width: int, height: int) ---;
+	set_window_min_size :: proc(width: i32, height: i32) ---;
 
 	// Set window dimensions
 	@(link_name="SetWindowSize")
-	set_window_size :: proc(width: int, height: int) ---;
+	set_window_size :: proc(width: i32, height: i32) ---;
 
 	// Get native window handle
 	@(link_name="GetWindowHandle")
@@ -789,43 +789,43 @@ foreign raylib
 
 	// Get current screen width
 	@(link_name="GetScreenWidth")
-	get_screen_width :: proc() -> int ---;
+	get_screen_width :: proc() -> i32 ---;
 
 	// Get current screen height
 	@(link_name="GetScreenHeight")
-	get_screen_height :: proc() -> int ---;
+	get_screen_height :: proc() -> i32 ---;
 
 	// Get number of connected monitors
 	@(link_name="GetMonitorCount")
-	get_monitor_count :: proc() -> int ---;
+	get_monitor_count :: proc() -> i32 ---;
 
 	// Get current connected monitor
 	@(link_name="GetCurrentMonitor")
-	get_current_monitor :: proc() -> int ---;
+	get_current_monitor :: proc() -> i32 ---;
 
 	// Get specified monitor position
 	@(link_name="GetMonitorPosition")
-	get_monitor_position :: proc(monitor: int) -> Vector2 ---;
+	get_monitor_position :: proc(monitor: i32) -> Vector2 ---;
 
 	// Get specified monitor width (max available by monitor)
 	@(link_name="GetMonitorWidth")
-	get_monitor_width :: proc(monitor: int) -> int ---;
+	get_monitor_width :: proc(monitor: i32) -> i32 ---;
 
 	// Get specified monitor height (max available by monitor)
 	@(link_name="GetMonitorHeight")
-	get_monitor_height :: proc(monitor: int) -> int ---;
+	get_monitor_height :: proc(monitor: i32) -> i32 ---;
 
 	// Get specified monitor physical width in millimetres
 	@(link_name="GetMonitorPhysicalWidth")
-	get_monitor_physical_width :: proc(monitor: int) -> int ---;
+	get_monitor_physical_width :: proc(monitor: i32) -> i32 ---;
 
 	// Get specified monitor physical height in millimetres
 	@(link_name="GetMonitorPhysicalHeight")
-	get_monitor_physical_height :: proc(monitor: int) -> int ---;
+	get_monitor_physical_height :: proc(monitor: i32) -> i32 ---;
 
 	// Get specified monitor refresh rate
 	@(link_name="GetMonitorRefreshRate")
-	get_monitor_refresh_rate :: proc(monitor: int) -> int ---;
+	get_monitor_refresh_rate :: proc(monitor: i32) -> i32 ---;
 
 	// Get window position XY on monitor
 	@(link_name="GetWindowPosition")
@@ -837,7 +837,7 @@ foreign raylib
 
 	// Get the human-readable, UTF-8 encoded name of the primary monitor
 	@(link_name="GetMonitorName")
-	get_monitor_name :: proc(monitor: int) -> cstring ---;
+	get_monitor_name :: proc(monitor: i32) -> cstring ---;
 
 	// Set clipboard text content
 	@(link_name="SetClipboardText")
@@ -913,7 +913,7 @@ foreign raylib
 
 	// Begin blending mode (alpha, additive, multiplied, subtract, custom)
 	@(link_name="BeginBlendMode")
-	begin_blend_mode :: proc(mode: int) ---;
+	begin_blend_mode :: proc(mode: i32) ---;
 
 	// End blending mode (reset to default: alpha blending)
 	@(link_name="EndBlendMode")
@@ -921,7 +921,7 @@ foreign raylib
 
 	// Begin scissor mode (define screen area for following drawing)
 	@(link_name="BeginScissorMode")
-	begin_scissor_mode :: proc(x: int, y: int, width: int, height: int) ---;
+	begin_scissor_mode :: proc(x: i32, y: i32, width: i32, height: i32) ---;
 
 	// End scissor mode
 	@(link_name="EndScissorMode")
@@ -953,27 +953,27 @@ foreign raylib
 
 	// Get shader uniform location
 	@(link_name="GetShaderLocation")
-	get_shader_location :: proc(shader: Shader, uniform_name: cstring) -> int ---;
+	get_shader_location :: proc(shader: Shader, uniform_name: cstring) -> i32 ---;
 
 	// Get shader attribute location
 	@(link_name="GetShaderLocationAttrib")
-	get_shader_location_attrib :: proc(shader: Shader, attrib_name: cstring) -> int ---;
+	get_shader_location_attrib :: proc(shader: Shader, attrib_name: cstring) -> i32 ---;
 
 	// Set shader uniform value
 	@(link_name="SetShaderValue")
-	set_shader_value :: proc(shader: Shader, loc_index: int, value: rawptr, uniform_type: int) ---;
+	set_shader_value :: proc(shader: Shader, loc_index: i32, value: rawptr, uniform_type: i32) ---;
 
 	// Set shader uniform value vector
 	@(link_name="SetShaderValueV")
-	set_shader_value_v :: proc(shader: Shader, loc_index: int, value: rawptr, uniform_type: int, count: int) ---;
+	set_shader_value_v :: proc(shader: Shader, loc_index: i32, value: rawptr, uniform_type: i32, count: i32) ---;
 
 	// Set shader uniform value (matrix 4x4)
 	@(link_name="SetShaderValueMatrix")
-	set_shader_value_matrix :: proc(shader: Shader, loc_index: int, mat: Matrix) ---;
+	set_shader_value_matrix :: proc(shader: Shader, loc_index: i32, mat: Matrix) ---;
 
 	// Set shader uniform value for texture (sampler2d)
 	@(link_name="SetShaderValueTexture")
-	set_shader_value_texture :: proc(shader: Shader, loc_index: int, texture: Texture2d) ---;
+	set_shader_value_texture :: proc(shader: Shader, loc_index: i32, texture: Texture2d) ---;
 
 	// Unload shader from GPU memory (VRAM)
 	@(link_name="UnloadShader")
@@ -997,7 +997,7 @@ foreign raylib
 
 	// Returns size position for a 3d world space position
 	@(link_name="GetWorldToScreenEx")
-	get_world_to_screen_ex :: proc(position: Vector3, camera: Camera, width: int, height: int) -> Vector2 ---;
+	get_world_to_screen_ex :: proc(position: Vector3, camera: Camera, width: i32, height: i32) -> Vector2 ---;
 
 	// Returns the screen space position for a 2d camera world space position
 	@(link_name="GetWorldToScreen2D")
@@ -1009,11 +1009,11 @@ foreign raylib
 
 	// Set target FPS (maximum)
 	@(link_name="SetTargetFPS")
-	set_target_fps :: proc(fps: int) ---;
+	set_target_fps :: proc(fps: i32) ---;
 
 	// Returns current FPS
 	@(link_name="GetFPS")
-	get_fps :: proc() -> int ---;
+	get_fps :: proc() -> i32 ---;
 
 	// Returns time in seconds for last frame drawn (delta time)
 	@(link_name="GetFrameTime")
@@ -1025,7 +1025,7 @@ foreign raylib
 
 	// Returns a random value between min and max (both included)
 	@(link_name="GetRandomValue")
-	get_random_value :: proc(min: int, max: int) -> int ---;
+	get_random_value :: proc(min: i32, max: i32) -> i32 ---;
 
 	// Takes a screenshot of current screen (filename extension defines format)
 	@(link_name="TakeScreenshot")
@@ -1037,19 +1037,19 @@ foreign raylib
 
 	// Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 	@(link_name="TraceLog")
-	trace_log :: proc(log_level: int, text: cstring, #c_vararg args: ..any) ---;
+	trace_log :: proc(log_level: i32, text: cstring, #c_vararg args: ..any) ---;
 
 	// Set the current threshold (minimum) log level
 	@(link_name="SetTraceLogLevel")
-	set_trace_log_level :: proc(log_level: int) ---;
+	set_trace_log_level :: proc(log_level: i32) ---;
 
 	// Internal memory allocator
 	@(link_name="MemAlloc")
-	mem_alloc :: proc(size: int) -> rawptr ---;
+	mem_alloc :: proc(size: i32) -> rawptr ---;
 
 	// Internal memory reallocator
 	@(link_name="MemRealloc")
-	mem_realloc :: proc(ptr: rawptr, size: int) -> rawptr ---;
+	mem_realloc :: proc(ptr: rawptr, size: i32) -> rawptr ---;
 
 	// Internal memory free
 	@(link_name="MemFree")
@@ -1137,7 +1137,7 @@ foreign raylib
 
 	// Get filenames in a directory path (memory should be freed)
 	@(link_name="GetDirectoryFiles")
-	get_directory_files :: proc(dir_path: cstring, count: ^int) -> ^cstring ---;
+	get_directory_files :: proc(dir_path: cstring, count: ^i32) -> ^cstring ---;
 
 	// Clear directory files paths buffers (free memory)
 	@(link_name="ClearDirectoryFiles")
@@ -1153,7 +1153,7 @@ foreign raylib
 
 	// Get dropped files names (memory should be freed)
 	@(link_name="GetDroppedFiles")
-	get_dropped_files :: proc(count: ^int) -> ^cstring ---;
+	get_dropped_files :: proc(count: ^i32) -> ^cstring ---;
 
 	// Clear dropped files paths buffer (free memory)
 	@(link_name="ClearDroppedFiles")
@@ -1165,19 +1165,19 @@ foreign raylib
 
 	// Compress data (DEFLATE algorithm)
 	@(link_name="CompressData")
-	compress_data :: proc(data: ^u8, data_length: int, comp_data_length: ^int) -> ^u8 ---;
+	compress_data :: proc(data: ^u8, data_length: i32, comp_data_length: ^i32) -> ^u8 ---;
 
 	// Decompress data (DEFLATE algorithm)
 	@(link_name="DecompressData")
-	decompress_data :: proc(comp_data: ^u8, comp_data_length: int, data_length: ^int) -> ^u8 ---;
+	decompress_data :: proc(comp_data: ^u8, comp_data_length: i32, data_length: ^i32) -> ^u8 ---;
 
 	// Save integer value to storage file (to defined position), returns true on success
 	@(link_name="SaveStorageValue")
-	save_storage_value :: proc(position: u32, value: int) -> bool ---;
+	save_storage_value :: proc(position: u32, value: i32) -> bool ---;
 
 	// Load integer value from storage file (from defined position)
 	@(link_name="LoadStorageValue")
-	load_storage_value :: proc(position: u32) -> int ---;
+	load_storage_value :: proc(position: u32) -> i32 ---;
 
 	// Open URL with default system browser (if available)
 	@(link_name="OpenURL")
@@ -1185,99 +1185,99 @@ foreign raylib
 
 	// Detect if a key has been pressed once
 	@(link_name="IsKeyPressed")
-	is_key_pressed :: proc(key: int) -> bool ---;
+	is_key_pressed :: proc(key: i32) -> bool ---;
 
 	// Detect if a key is being pressed
 	@(link_name="IsKeyDown")
-	is_key_down :: proc(key: int) -> bool ---;
+	is_key_down :: proc(key: i32) -> bool ---;
 
 	// Detect if a key has been released once
 	@(link_name="IsKeyReleased")
-	is_key_released :: proc(key: int) -> bool ---;
+	is_key_released :: proc(key: i32) -> bool ---;
 
 	// Detect if a key is NOT being pressed
 	@(link_name="IsKeyUp")
-	is_key_up :: proc(key: int) -> bool ---;
+	is_key_up :: proc(key: i32) -> bool ---;
 
 	// Set a custom key to exit program (default is ESC)
 	@(link_name="SetExitKey")
-	set_exit_key :: proc(key: int) ---;
+	set_exit_key :: proc(key: i32) ---;
 
 	// Get key pressed (keycode), call it multiple times for keys queued
 	@(link_name="GetKeyPressed")
-	get_key_pressed :: proc() -> int ---;
+	get_key_pressed :: proc() -> i32 ---;
 
 	// Get char pressed (unicode), call it multiple times for chars queued
 	@(link_name="GetCharPressed")
-	get_char_pressed :: proc() -> int ---;
+	get_char_pressed :: proc() -> i32 ---;
 
 	// Detect if a gamepad is available
 	@(link_name="IsGamepadAvailable")
-	is_gamepad_available :: proc(gamepad: int) -> bool ---;
+	is_gamepad_available :: proc(gamepad: i32) -> bool ---;
 
 	// Check gamepad name (if available)
 	@(link_name="IsGamepadName")
-	is_gamepad_name :: proc(gamepad: int, name: cstring) -> bool ---;
+	is_gamepad_name :: proc(gamepad: i32, name: cstring) -> bool ---;
 
 	// Return gamepad internal name id
 	@(link_name="GetGamepadName")
-	get_gamepad_name :: proc(gamepad: int) -> cstring ---;
+	get_gamepad_name :: proc(gamepad: i32) -> cstring ---;
 
 	// Detect if a gamepad button has been pressed once
 	@(link_name="IsGamepadButtonPressed")
-	is_gamepad_button_pressed :: proc(gamepad: int, button: int) -> bool ---;
+	is_gamepad_button_pressed :: proc(gamepad: i32, button: i32) -> bool ---;
 
 	// Detect if a gamepad button is being pressed
 	@(link_name="IsGamepadButtonDown")
-	is_gamepad_button_down :: proc(gamepad: int, button: int) -> bool ---;
+	is_gamepad_button_down :: proc(gamepad: i32, button: i32) -> bool ---;
 
 	// Detect if a gamepad button has been released once
 	@(link_name="IsGamepadButtonReleased")
-	is_gamepad_button_released :: proc(gamepad: int, button: int) -> bool ---;
+	is_gamepad_button_released :: proc(gamepad: i32, button: i32) -> bool ---;
 
 	// Detect if a gamepad button is NOT being pressed
 	@(link_name="IsGamepadButtonUp")
-	is_gamepad_button_up :: proc(gamepad: int, button: int) -> bool ---;
+	is_gamepad_button_up :: proc(gamepad: i32, button: i32) -> bool ---;
 
 	// Get the last gamepad button pressed
 	@(link_name="GetGamepadButtonPressed")
-	get_gamepad_button_pressed :: proc() -> int ---;
+	get_gamepad_button_pressed :: proc() -> i32 ---;
 
 	// Return gamepad axis count for a gamepad
 	@(link_name="GetGamepadAxisCount")
-	get_gamepad_axis_count :: proc(gamepad: int) -> int ---;
+	get_gamepad_axis_count :: proc(gamepad: i32) -> i32 ---;
 
 	// Return axis movement value for a gamepad axis
 	@(link_name="GetGamepadAxisMovement")
-	get_gamepad_axis_movement :: proc(gamepad: int, axis: int) -> f32 ---;
+	get_gamepad_axis_movement :: proc(gamepad: i32, axis: i32) -> f32 ---;
 
 	// Set internal gamepad mappings (SDL_GameControllerDB)
 	@(link_name="SetGamepadMappings")
-	set_gamepad_mappings :: proc(mappings: cstring) -> int ---;
+	set_gamepad_mappings :: proc(mappings: cstring) -> i32 ---;
 
 	// Detect if a mouse button has been pressed once
 	@(link_name="IsMouseButtonPressed")
-	is_mouse_button_pressed :: proc(button: int) -> bool ---;
+	is_mouse_button_pressed :: proc(button: i32) -> bool ---;
 
 	// Detect if a mouse button is being pressed
 	@(link_name="IsMouseButtonDown")
-	is_mouse_button_down :: proc(button: int) -> bool ---;
+	is_mouse_button_down :: proc(button: i32) -> bool ---;
 
 	// Detect if a mouse button has been released once
 	@(link_name="IsMouseButtonReleased")
-	is_mouse_button_released :: proc(button: int) -> bool ---;
+	is_mouse_button_released :: proc(button: i32) -> bool ---;
 
 	// Detect if a mouse button is NOT being pressed
 	@(link_name="IsMouseButtonUp")
-	is_mouse_button_up :: proc(button: int) -> bool ---;
+	is_mouse_button_up :: proc(button: i32) -> bool ---;
 
 	// Returns mouse position X
 	@(link_name="GetMouseX")
-	get_mouse_x :: proc() -> int ---;
+	get_mouse_x :: proc() -> i32 ---;
 
 	// Returns mouse position Y
 	@(link_name="GetMouseY")
-	get_mouse_y :: proc() -> int ---;
+	get_mouse_y :: proc() -> i32 ---;
 
 	// Returns mouse position XY
 	@(link_name="GetMousePosition")
@@ -1285,11 +1285,11 @@ foreign raylib
 
 	// Set mouse position XY
 	@(link_name="SetMousePosition")
-	set_mouse_position :: proc(x: int, y: int) ---;
+	set_mouse_position :: proc(x: i32, y: i32) ---;
 
 	// Set mouse offset
 	@(link_name="SetMouseOffset")
-	set_mouse_offset :: proc(offset_x: int, offset_y: int) ---;
+	set_mouse_offset :: proc(offset_x: i32, offset_y: i32) ---;
 
 	// Set mouse scaling
 	@(link_name="SetMouseScale")
@@ -1301,19 +1301,19 @@ foreign raylib
 
 	// Set mouse cursor
 	@(link_name="SetMouseCursor")
-	set_mouse_cursor :: proc(cursor: int) ---;
+	set_mouse_cursor :: proc(cursor: i32) ---;
 
 	// Returns touch position X for touch point 0 (relative to screen size)
 	@(link_name="GetTouchX")
-	get_touch_x :: proc() -> int ---;
+	get_touch_x :: proc() -> i32 ---;
 
 	// Returns touch position Y for touch point 0 (relative to screen size)
 	@(link_name="GetTouchY")
-	get_touch_y :: proc() -> int ---;
+	get_touch_y :: proc() -> i32 ---;
 
 	// Returns touch position XY for a touch point index (relative to screen size)
 	@(link_name="GetTouchPosition")
-	get_touch_position :: proc(index: int) -> Vector2 ---;
+	get_touch_position :: proc(index: i32) -> Vector2 ---;
 
 	// Enable a set of gestures using flags
 	@(link_name="SetGesturesEnabled")
@@ -1321,15 +1321,15 @@ foreign raylib
 
 	// Check if a gesture have been detected
 	@(link_name="IsGestureDetected")
-	is_gesture_detected :: proc(gesture: int) -> bool ---;
+	is_gesture_detected :: proc(gesture: i32) -> bool ---;
 
 	// Get latest detected gesture
 	@(link_name="GetGestureDetected")
-	get_gesture_detected :: proc() -> int ---;
+	get_gesture_detected :: proc() -> i32 ---;
 
 	// Get touch points count
 	@(link_name="GetTouchPointsCount")
-	get_touch_points_count :: proc() -> int ---;
+	get_touch_points_count :: proc() -> i32 ---;
 
 	// Get gesture hold time in milliseconds
 	@(link_name="GetGestureHoldDuration")
@@ -1353,7 +1353,7 @@ foreign raylib
 
 	// Set camera mode (multiple camera modes available)
 	@(link_name="SetCameraMode")
-	set_camera_mode :: proc(camera: Camera, mode: int) ---;
+	set_camera_mode :: proc(camera: Camera, mode: i32) ---;
 
 	// Update camera position for selected mode
 	@(link_name="UpdateCamera")
@@ -1361,19 +1361,19 @@ foreign raylib
 
 	// Set camera pan key to combine with mouse movement (free camera)
 	@(link_name="SetCameraPanControl")
-	set_camera_pan_control :: proc(key_pan: int) ---;
+	set_camera_pan_control :: proc(key_pan: i32) ---;
 
 	// Set camera alt key to combine with mouse movement (free camera)
 	@(link_name="SetCameraAltControl")
-	set_camera_alt_control :: proc(key_alt: int) ---;
+	set_camera_alt_control :: proc(key_alt: i32) ---;
 
 	// Set camera smooth zoom key to combine with mouse (free camera)
 	@(link_name="SetCameraSmoothZoomControl")
-	set_camera_smooth_zoom_control :: proc(key_smooth_zoom: int) ---;
+	set_camera_smooth_zoom_control :: proc(key_smooth_zoom: i32) ---;
 
 	// Set camera move controls (1st person and 3rd person cameras)
 	@(link_name="SetCameraMoveControls")
-	set_camera_move_controls :: proc(key_front: int, key_back: int, key_right: int, key_left: int, key_up: int, key_down: int) ---;
+	set_camera_move_controls :: proc(key_front: i32, key_back: i32, key_right: i32, key_left: i32, key_up: i32, key_down: i32) ---;
 
 	// Set texture and rectangle to be used on shapes drawing
 	@(link_name="SetShapesTexture")
@@ -1381,7 +1381,7 @@ foreign raylib
 
 	// Draw a pixel
 	@(link_name="DrawPixel")
-	draw_pixel :: proc(pos_x: int, pos_y: int, color: Color) ---;
+	draw_pixel :: proc(pos_x: i32, pos_y: i32, color: Color) ---;
 
 	// Draw a pixel (Vector version)
 	@(link_name="DrawPixelV")
@@ -1389,7 +1389,7 @@ foreign raylib
 
 	// Draw a line
 	@(link_name="DrawLine")
-	draw_line :: proc(start_pos_x: int, start_pos_y: int, end_pos_x: int, end_pos_y: int, color: Color) ---;
+	draw_line :: proc(start_pos_x: i32, start_pos_y: i32, end_pos_x: i32, end_pos_y: i32, color: Color) ---;
 
 	// Draw a line (Vector version)
 	@(link_name="DrawLineV")
@@ -1409,23 +1409,23 @@ foreign raylib
 
 	// Draw lines sequence
 	@(link_name="DrawLineStrip")
-	draw_line_strip :: proc(points: ^Vector2, points_count: int, color: Color) ---;
+	draw_line_strip :: proc(points: ^Vector2, points_count: i32, color: Color) ---;
 
 	// Draw a color-filled circle
 	@(link_name="DrawCircle")
-	draw_circle :: proc(center_x: int, center_y: int, radius: f32, color: Color) ---;
+	draw_circle :: proc(center_x: i32, center_y: i32, radius: f32, color: Color) ---;
 
 	// Draw a piece of a circle
 	@(link_name="DrawCircleSector")
-	draw_circle_sector :: proc(center: Vector2, radius: f32, start_angle: f32, end_angle: f32, segments: int, color: Color) ---;
+	draw_circle_sector :: proc(center: Vector2, radius: f32, start_angle: f32, end_angle: f32, segments: i32, color: Color) ---;
 
 	// Draw circle sector outline
 	@(link_name="DrawCircleSectorLines")
-	draw_circle_sector_lines :: proc(center: Vector2, radius: f32, start_angle: f32, end_angle: f32, segments: int, color: Color) ---;
+	draw_circle_sector_lines :: proc(center: Vector2, radius: f32, start_angle: f32, end_angle: f32, segments: i32, color: Color) ---;
 
 	// Draw a gradient-filled circle
 	@(link_name="DrawCircleGradient")
-	draw_circle_gradient :: proc(center_x: int, center_y: int, radius: f32, color1: Color, color2: Color) ---;
+	draw_circle_gradient :: proc(center_x: i32, center_y: i32, radius: f32, color1: Color, color2: Color) ---;
 
 	// Draw a color-filled circle (Vector version)
 	@(link_name="DrawCircleV")
@@ -1433,27 +1433,27 @@ foreign raylib
 
 	// Draw circle outline
 	@(link_name="DrawCircleLines")
-	draw_circle_lines :: proc(center_x: int, center_y: int, radius: f32, color: Color) ---;
+	draw_circle_lines :: proc(center_x: i32, center_y: i32, radius: f32, color: Color) ---;
 
 	// Draw ellipse
 	@(link_name="DrawEllipse")
-	draw_ellipse :: proc(center_x: int, center_y: int, radius_h: f32, radius_v: f32, color: Color) ---;
+	draw_ellipse :: proc(center_x: i32, center_y: i32, radius_h: f32, radius_v: f32, color: Color) ---;
 
 	// Draw ellipse outline
 	@(link_name="DrawEllipseLines")
-	draw_ellipse_lines :: proc(center_x: int, center_y: int, radius_h: f32, radius_v: f32, color: Color) ---;
+	draw_ellipse_lines :: proc(center_x: i32, center_y: i32, radius_h: f32, radius_v: f32, color: Color) ---;
 
 	// Draw ring
 	@(link_name="DrawRing")
-	draw_ring :: proc(center: Vector2, inner_radius: f32, outer_radius: f32, start_angle: f32, end_angle: f32, segments: int, color: Color) ---;
+	draw_ring :: proc(center: Vector2, inner_radius: f32, outer_radius: f32, start_angle: f32, end_angle: f32, segments: i32, color: Color) ---;
 
 	// Draw ring outline
 	@(link_name="DrawRingLines")
-	draw_ring_lines :: proc(center: Vector2, inner_radius: f32, outer_radius: f32, start_angle: f32, end_angle: f32, segments: int, color: Color) ---;
+	draw_ring_lines :: proc(center: Vector2, inner_radius: f32, outer_radius: f32, start_angle: f32, end_angle: f32, segments: i32, color: Color) ---;
 
 	// Draw a color-filled rectangle
 	@(link_name="DrawRectangle")
-	draw_rectangle :: proc(pos_x: int, pos_y: int, width: int, height: int, color: Color) ---;
+	draw_rectangle :: proc(pos_x: i32, pos_y: i32, width: i32, height: i32, color: Color) ---;
 
 	// Draw a color-filled rectangle (Vector version)
 	@(link_name="DrawRectangleV")
@@ -1469,11 +1469,11 @@ foreign raylib
 
 	// Draw a vertical-gradient-filled rectangle
 	@(link_name="DrawRectangleGradientV")
-	draw_rectangle_gradient_v :: proc(pos_x: int, pos_y: int, width: int, height: int, color1: Color, color2: Color) ---;
+	draw_rectangle_gradient_v :: proc(pos_x: i32, pos_y: i32, width: i32, height: i32, color1: Color, color2: Color) ---;
 
 	// Draw a horizontal-gradient-filled rectangle
 	@(link_name="DrawRectangleGradientH")
-	draw_rectangle_gradient_h :: proc(pos_x: int, pos_y: int, width: int, height: int, color1: Color, color2: Color) ---;
+	draw_rectangle_gradient_h :: proc(pos_x: i32, pos_y: i32, width: i32, height: i32, color1: Color, color2: Color) ---;
 
 	// Draw a gradient-filled rectangle with custom vertex colors
 	@(link_name="DrawRectangleGradientEx")
@@ -1481,7 +1481,7 @@ foreign raylib
 
 	// Draw rectangle outline
 	@(link_name="DrawRectangleLines")
-	draw_rectangle_lines :: proc(pos_x: int, pos_y: int, width: int, height: int, color: Color) ---;
+	draw_rectangle_lines :: proc(pos_x: i32, pos_y: i32, width: i32, height: i32, color: Color) ---;
 
 	// Draw rectangle outline with extended parameters
 	@(link_name="DrawRectangleLinesEx")
@@ -1489,11 +1489,11 @@ foreign raylib
 
 	// Draw rectangle with rounded edges
 	@(link_name="DrawRectangleRounded")
-	draw_rectangle_rounded :: proc(rec: Rectangle, roundness: f32, segments: int, color: Color) ---;
+	draw_rectangle_rounded :: proc(rec: Rectangle, roundness: f32, segments: i32, color: Color) ---;
 
 	// Draw rectangle with rounded edges outline
 	@(link_name="DrawRectangleRoundedLines")
-	draw_rectangle_rounded_lines :: proc(rec: Rectangle, roundness: f32, segments: int, line_thick: f32, color: Color) ---;
+	draw_rectangle_rounded_lines :: proc(rec: Rectangle, roundness: f32, segments: i32, line_thick: f32, color: Color) ---;
 
 	// Draw a color-filled triangle (vertex in counter-clockwise order!)
 	@(link_name="DrawTriangle")
@@ -1505,23 +1505,23 @@ foreign raylib
 
 	// Draw a triangle fan defined by points (first vertex is the center)
 	@(link_name="DrawTriangleFan")
-	draw_triangle_fan :: proc(points: ^Vector2, points_count: int, color: Color) ---;
+	draw_triangle_fan :: proc(points: ^Vector2, points_count: i32, color: Color) ---;
 
 	// Draw a triangle strip defined by points
 	@(link_name="DrawTriangleStrip")
-	draw_triangle_strip :: proc(points: ^Vector2, points_count: int, color: Color) ---;
+	draw_triangle_strip :: proc(points: ^Vector2, points_count: i32, color: Color) ---;
 
 	// Draw a regular polygon (Vector version)
 	@(link_name="DrawPoly")
-	draw_poly :: proc(center: Vector2, sides: int, radius: f32, rotation: f32, color: Color) ---;
+	draw_poly :: proc(center: Vector2, sides: i32, radius: f32, rotation: f32, color: Color) ---;
 
 	// Draw a polygon outline of n sides
 	@(link_name="DrawPolyLines")
-	draw_poly_lines :: proc(center: Vector2, sides: int, radius: f32, rotation: f32, color: Color) ---;
+	draw_poly_lines :: proc(center: Vector2, sides: i32, radius: f32, rotation: f32, color: Color) ---;
 
 	// Draw a polygon outline of n sides with extended parameters
 	@(link_name="DrawPolyLinesEx")
-	draw_poly_lines_ex :: proc(center: Vector2, sides: int, radius: f32, rotation: f32, line_thick: f32, color: Color) ---;
+	draw_poly_lines_ex :: proc(center: Vector2, sides: i32, radius: f32, rotation: f32, line_thick: f32, color: Color) ---;
 
 	// Check collision between two rectangles
 	@(link_name="CheckCollisionRecs")
@@ -1561,15 +1561,15 @@ foreign raylib
 
 	// Load image from RAW file data
 	@(link_name="LoadImageRaw")
-	load_image_raw :: proc(file_name: cstring, width: int, height: int, format: int, header_size: int) -> Image ---;
+	load_image_raw :: proc(file_name: cstring, width: i32, height: i32, format: i32, header_size: i32) -> Image ---;
 
 	// Load image sequence from file (frames appended to image.data)
 	@(link_name="LoadImageAnim")
-	load_image_anim :: proc(file_name: cstring, frames: ^int) -> Image ---;
+	load_image_anim :: proc(file_name: cstring, frames: ^i32) -> Image ---;
 
 	// Load image from memory buffer, fileType refers to extension: i.e. '.png'
 	@(link_name="LoadImageFromMemory")
-	load_image_from_memory :: proc(file_type: cstring, file_data: ^u8, data_size: int) -> Image ---;
+	load_image_from_memory :: proc(file_type: cstring, file_data: ^u8, data_size: i32) -> Image ---;
 
 	// Unload image from CPU memory (RAM)
 	@(link_name="UnloadImage")
@@ -1585,35 +1585,35 @@ foreign raylib
 
 	// Generate image: plain color
 	@(link_name="GenImageColor")
-	gen_image_color :: proc(width: int, height: int, color: Color) -> Image ---;
+	gen_image_color :: proc(width: i32, height: i32, color: Color) -> Image ---;
 
 	// Generate image: vertical gradient
 	@(link_name="GenImageGradientV")
-	gen_image_gradient_v :: proc(width: int, height: int, top: Color, bottom: Color) -> Image ---;
+	gen_image_gradient_v :: proc(width: i32, height: i32, top: Color, bottom: Color) -> Image ---;
 
 	// Generate image: horizontal gradient
 	@(link_name="GenImageGradientH")
-	gen_image_gradient_h :: proc(width: int, height: int, left: Color, right: Color) -> Image ---;
+	gen_image_gradient_h :: proc(width: i32, height: i32, left: Color, right: Color) -> Image ---;
 
 	// Generate image: radial gradient
 	@(link_name="GenImageGradientRadial")
-	gen_image_gradient_radial :: proc(width: int, height: int, density: f32, inner: Color, outer: Color) -> Image ---;
+	gen_image_gradient_radial :: proc(width: i32, height: i32, density: f32, inner: Color, outer: Color) -> Image ---;
 
 	// Generate image: checked
 	@(link_name="GenImageChecked")
-	gen_image_checked :: proc(width: int, height: int, checks_x: int, checks_y: int, col1: Color, col2: Color) -> Image ---;
+	gen_image_checked :: proc(width: i32, height: i32, checks_x: i32, checks_y: i32, col1: Color, col2: Color) -> Image ---;
 
 	// Generate image: white noise
 	@(link_name="GenImageWhiteNoise")
-	gen_image_white_noise :: proc(width: int, height: int, factor: f32) -> Image ---;
+	gen_image_white_noise :: proc(width: i32, height: i32, factor: f32) -> Image ---;
 
 	// Generate image: perlin noise
 	@(link_name="GenImagePerlinNoise")
-	gen_image_perlin_noise :: proc(width: int, height: int, offset_x: int, offset_y: int, scale: f32) -> Image ---;
+	gen_image_perlin_noise :: proc(width: i32, height: i32, offset_x: i32, offset_y: i32, scale: f32) -> Image ---;
 
 	// Generate image: cellular algorithm. Bigger tileSize means bigger cells
 	@(link_name="GenImageCellular")
-	gen_image_cellular :: proc(width: int, height: int, tile_size: int) -> Image ---;
+	gen_image_cellular :: proc(width: i32, height: i32, tile_size: i32) -> Image ---;
 
 	// Create an image duplicate (useful for transformations)
 	@(link_name="ImageCopy")
@@ -1625,7 +1625,7 @@ foreign raylib
 
 	// Create an image from text (default font)
 	@(link_name="ImageText")
-	image_text :: proc(text: cstring, font_size: int, color: Color) -> Image ---;
+	image_text :: proc(text: cstring, font_size: i32, color: Color) -> Image ---;
 
 	// Create an image from text (custom sprite font)
 	@(link_name="ImageTextEx")
@@ -1633,7 +1633,7 @@ foreign raylib
 
 	// Convert image data to desired format
 	@(link_name="ImageFormat")
-	image_format :: proc(image: ^Image, new_format: int) ---;
+	image_format :: proc(image: ^Image, new_format: i32) ---;
 
 	// Convert image to POT (power-of-two)
 	@(link_name="ImageToPOT")
@@ -1661,15 +1661,15 @@ foreign raylib
 
 	// Resize image (Bicubic scaling algorithm)
 	@(link_name="ImageResize")
-	image_resize :: proc(image: ^Image, new_width: int, new_height: int) ---;
+	image_resize :: proc(image: ^Image, new_width: i32, new_height: i32) ---;
 
 	// Resize image (Nearest-Neighbor scaling algorithm)
 	@(link_name="ImageResizeNN")
-	image_resize_nn :: proc(image: ^Image, new_width: int, new_height: int) ---;
+	image_resize_nn :: proc(image: ^Image, new_width: i32, new_height: i32) ---;
 
 	// Resize canvas and fill with color
 	@(link_name="ImageResizeCanvas")
-	image_resize_canvas :: proc(image: ^Image, new_width: int, new_height: int, offset_x: int, offset_y: int, fill: Color) ---;
+	image_resize_canvas :: proc(image: ^Image, new_width: i32, new_height: i32, offset_x: i32, offset_y: i32, fill: Color) ---;
 
 	// Compute all mipmap levels for a provided image
 	@(link_name="ImageMipmaps")
@@ -1677,7 +1677,7 @@ foreign raylib
 
 	// Dither image data to 16bpp or lower (Floyd-Steinberg dithering)
 	@(link_name="ImageDither")
-	image_dither :: proc(image: ^Image, r_bpp: int, g_bpp: int, b_bpp: int, a_bpp: int) ---;
+	image_dither :: proc(image: ^Image, r_bpp: i32, g_bpp: i32, b_bpp: i32, a_bpp: i32) ---;
 
 	// Flip image vertically
 	@(link_name="ImageFlipVertical")
@@ -1713,7 +1713,7 @@ foreign raylib
 
 	// Modify image color: brightness (-255 to 255)
 	@(link_name="ImageColorBrightness")
-	image_color_brightness :: proc(image: ^Image, brightness: int) ---;
+	image_color_brightness :: proc(image: ^Image, brightness: i32) ---;
 
 	// Modify image color: replace color
 	@(link_name="ImageColorReplace")
@@ -1725,7 +1725,7 @@ foreign raylib
 
 	// Load colors palette from image as a Color array (RGBA - 32bit)
 	@(link_name="LoadImagePalette")
-	load_image_palette :: proc(image: Image, max_palette_size: int, colors_count: ^int) -> ^Color ---;
+	load_image_palette :: proc(image: Image, max_palette_size: i32, colors_count: ^i32) -> ^Color ---;
 
 	// Unload color data loaded with LoadImageColors()
 	@(link_name="UnloadImageColors")
@@ -1745,7 +1745,7 @@ foreign raylib
 
 	// Draw pixel within an image
 	@(link_name="ImageDrawPixel")
-	image_draw_pixel :: proc(dst: ^Image, pos_x: int, pos_y: int, color: Color) ---;
+	image_draw_pixel :: proc(dst: ^Image, pos_x: i32, pos_y: i32, color: Color) ---;
 
 	// Draw pixel within an image (Vector version)
 	@(link_name="ImageDrawPixelV")
@@ -1753,7 +1753,7 @@ foreign raylib
 
 	// Draw line within an image
 	@(link_name="ImageDrawLine")
-	image_draw_line :: proc(dst: ^Image, start_pos_x: int, start_pos_y: int, end_pos_x: int, end_pos_y: int, color: Color) ---;
+	image_draw_line :: proc(dst: ^Image, start_pos_x: i32, start_pos_y: i32, end_pos_x: i32, end_pos_y: i32, color: Color) ---;
 
 	// Draw line within an image (Vector version)
 	@(link_name="ImageDrawLineV")
@@ -1761,15 +1761,15 @@ foreign raylib
 
 	// Draw circle within an image
 	@(link_name="ImageDrawCircle")
-	image_draw_circle :: proc(dst: ^Image, center_x: int, center_y: int, radius: int, color: Color) ---;
+	image_draw_circle :: proc(dst: ^Image, center_x: i32, center_y: i32, radius: i32, color: Color) ---;
 
 	// Draw circle within an image (Vector version)
 	@(link_name="ImageDrawCircleV")
-	image_draw_circle_v :: proc(dst: ^Image, center: Vector2, radius: int, color: Color) ---;
+	image_draw_circle_v :: proc(dst: ^Image, center: Vector2, radius: i32, color: Color) ---;
 
 	// Draw rectangle within an image
 	@(link_name="ImageDrawRectangle")
-	image_draw_rectangle :: proc(dst: ^Image, pos_x: int, pos_y: int, width: int, height: int, color: Color) ---;
+	image_draw_rectangle :: proc(dst: ^Image, pos_x: i32, pos_y: i32, width: i32, height: i32, color: Color) ---;
 
 	// Draw rectangle within an image (Vector version)
 	@(link_name="ImageDrawRectangleV")
@@ -1781,7 +1781,7 @@ foreign raylib
 
 	// Draw rectangle lines within an image
 	@(link_name="ImageDrawRectangleLines")
-	image_draw_rectangle_lines :: proc(dst: ^Image, rec: Rectangle, thick: int, color: Color) ---;
+	image_draw_rectangle_lines :: proc(dst: ^Image, rec: Rectangle, thick: i32, color: Color) ---;
 
 	// Draw a source image within a destination image (tint applied to source)
 	@(link_name="ImageDraw")
@@ -1789,7 +1789,7 @@ foreign raylib
 
 	// Draw text (using default font) within an image (destination)
 	@(link_name="ImageDrawText")
-	image_draw_text :: proc(dst: ^Image, text: cstring, pos_x: int, pos_y: int, font_size: int, color: Color) ---;
+	image_draw_text :: proc(dst: ^Image, text: cstring, pos_x: i32, pos_y: i32, font_size: i32, color: Color) ---;
 
 	// Draw text (custom sprite font) within an image (destination)
 	@(link_name="ImageDrawTextEx")
@@ -1805,11 +1805,11 @@ foreign raylib
 
 	// Load cubemap from image, multiple image cubemap layouts supported
 	@(link_name="LoadTextureCubemap")
-	load_texture_cubemap :: proc(image: Image, layout: int) -> Texture_Cubemap ---;
+	load_texture_cubemap :: proc(image: Image, layout: i32) -> Texture_Cubemap ---;
 
 	// Load texture for rendering (framebuffer)
 	@(link_name="LoadRenderTexture")
-	load_render_texture :: proc(width: int, height: int) -> Render_Texture2d ---;
+	load_render_texture :: proc(width: i32, height: i32) -> Render_Texture2d ---;
 
 	// Unload texture from GPU memory (VRAM)
 	@(link_name="UnloadTexture")
@@ -1841,15 +1841,15 @@ foreign raylib
 
 	// Set texture scaling filter mode
 	@(link_name="SetTextureFilter")
-	set_texture_filter :: proc(texture: Texture2d, filter: int) ---;
+	set_texture_filter :: proc(texture: Texture2d, filter: i32) ---;
 
 	// Set texture wrapping mode
 	@(link_name="SetTextureWrap")
-	set_texture_wrap :: proc(texture: Texture2d, wrap: int) ---;
+	set_texture_wrap :: proc(texture: Texture2d, wrap: i32) ---;
 
 	// Draw a Texture2D
 	@(link_name="DrawTexture")
-	draw_texture :: proc(texture: Texture2d, pos_x: int, pos_y: int, tint: Color) ---;
+	draw_texture :: proc(texture: Texture2d, pos_x: i32, pos_y: i32, tint: Color) ---;
 
 	// Draw a Texture2D with position defined as Vector2
 	@(link_name="DrawTextureV")
@@ -1881,7 +1881,7 @@ foreign raylib
 
 	// Draw a textured polygon
 	@(link_name="DrawTexturePoly")
-	draw_texture_poly :: proc(texture: Texture2d, center: Vector2, points: ^Vector2, texcoords: ^Vector2, points_count: int, tint: Color) ---;
+	draw_texture_poly :: proc(texture: Texture2d, center: Vector2, points: ^Vector2, texcoords: ^Vector2, points_count: i32, tint: Color) ---;
 
 	// Returns color with alpha applied, alpha goes from 0.0f to 1.0f
 	@(link_name="Fade")
@@ -1889,7 +1889,7 @@ foreign raylib
 
 	// Returns hexadecimal value for a Color
 	@(link_name="ColorToInt")
-	color_to_int :: proc(color: Color) -> int ---;
+	color_to_int :: proc(color: Color) -> i32 ---;
 
 	// Returns Color normalized as float [0..1]
 	@(link_name="ColorNormalize")
@@ -1917,19 +1917,19 @@ foreign raylib
 
 	// Get Color structure from hexadecimal value
 	@(link_name="GetColor")
-	get_color :: proc(hex_value: int) -> Color ---;
+	get_color :: proc(hex_value: i32) -> Color ---;
 
 	// Get Color from a source pixel pointer of certain format
 	@(link_name="GetPixelColor")
-	get_pixel_color :: proc(src_ptr: rawptr, format: int) -> Color ---;
+	get_pixel_color :: proc(src_ptr: rawptr, format: i32) -> Color ---;
 
 	// Set color formatted into destination pixel pointer
 	@(link_name="SetPixelColor")
-	set_pixel_color :: proc(dst_ptr: rawptr, color: Color, format: int) ---;
+	set_pixel_color :: proc(dst_ptr: rawptr, color: Color, format: i32) ---;
 
 	// Get pixel data size in bytes for certain format
 	@(link_name="GetPixelDataSize")
-	get_pixel_data_size :: proc(width: int, height: int, format: int) -> int ---;
+	get_pixel_data_size :: proc(width: i32, height: i32, format: i32) -> i32 ---;
 
 	// Get the default Font
 	@(link_name="GetFontDefault")
@@ -1941,27 +1941,27 @@ foreign raylib
 
 	// Load font from file with extended parameters
 	@(link_name="LoadFontEx")
-	load_font_ex :: proc(file_name: cstring, font_size: int, font_chars: ^int, chars_count: int) -> Font ---;
+	load_font_ex :: proc(file_name: cstring, font_size: i32, font_chars: ^i32, chars_count: i32) -> Font ---;
 
 	// Load font from Image (XNA style)
 	@(link_name="LoadFontFromImage")
-	load_font_from_image :: proc(image: Image, key: Color, first_char: int) -> Font ---;
+	load_font_from_image :: proc(image: Image, key: Color, first_char: i32) -> Font ---;
 
 	// Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
 	@(link_name="LoadFontFromMemory")
-	load_font_from_memory :: proc(file_type: cstring, file_data: ^u8, data_size: int, font_size: int, font_chars: ^int, chars_count: int) -> Font ---;
+	load_font_from_memory :: proc(file_type: cstring, file_data: ^u8, data_size: i32, font_size: i32, font_chars: ^i32, chars_count: i32) -> Font ---;
 
 	// Load font data for further use
 	@(link_name="LoadFontData")
-	load_font_data :: proc(file_data: ^u8, data_size: int, font_size: int, font_chars: ^int, chars_count: int, type: int) -> ^Char_Info ---;
+	load_font_data :: proc(file_data: ^u8, data_size: i32, font_size: i32, font_chars: ^i32, chars_count: i32, type: i32) -> ^Char_Info ---;
 
 	// Generate image font atlas using chars info
 	@(link_name="GenImageFontAtlas")
-	gen_image_font_atlas :: proc(chars: ^Char_Info, recs: ^^Rectangle, chars_count: int, font_size: int, padding: int, pack_method: int) -> Image ---;
+	gen_image_font_atlas :: proc(chars: ^Char_Info, recs: ^^Rectangle, chars_count: i32, font_size: i32, padding: i32, pack_method: i32) -> Image ---;
 
 	// Unload font chars info data (RAM)
 	@(link_name="UnloadFontData")
-	unload_font_data :: proc(chars: ^Char_Info, chars_count: int) ---;
+	unload_font_data :: proc(chars: ^Char_Info, chars_count: i32) ---;
 
 	// Unload Font from GPU memory (VRAM)
 	@(link_name="UnloadFont")
@@ -1969,11 +1969,11 @@ foreign raylib
 
 	// Draw current FPS
 	@(link_name="DrawFPS")
-	draw_fps :: proc(pos_x: int, pos_y: int) ---;
+	draw_fps :: proc(pos_x: i32, pos_y: i32) ---;
 
 	// Draw text (using default font)
 	@(link_name="DrawText")
-	draw_text :: proc(text: cstring, pos_x: int, pos_y: int, font_size: int, color: Color) ---;
+	draw_text :: proc(text: cstring, pos_x: i32, pos_y: i32, font_size: i32, color: Color) ---;
 
 	// Draw text using font and additional parameters
 	@(link_name="DrawTextEx")
@@ -1985,15 +1985,15 @@ foreign raylib
 
 	// Draw text using font inside rectangle limits with support for text selection
 	@(link_name="DrawTextRecEx")
-	draw_text_rec_ex :: proc(font: Font, text: cstring, rec: Rectangle, font_size: f32, spacing: f32, word_wrap: bool, tint: Color, select_start: int, select_length: int, select_tint: Color, select_back_tint: Color) ---;
+	draw_text_rec_ex :: proc(font: Font, text: cstring, rec: Rectangle, font_size: f32, spacing: f32, word_wrap: bool, tint: Color, select_start: i32, select_length: i32, select_tint: Color, select_back_tint: Color) ---;
 
 	// Draw one character (codepoint)
 	@(link_name="DrawTextCodepoint")
-	draw_text_codepoint :: proc(font: Font, codepoint: int, position: Vector2, font_size: f32, tint: Color) ---;
+	draw_text_codepoint :: proc(font: Font, codepoint: i32, position: Vector2, font_size: f32, tint: Color) ---;
 
 	// Measure string width for default font
 	@(link_name="MeasureText")
-	measure_text :: proc(text: cstring, font_size: int) -> int ---;
+	measure_text :: proc(text: cstring, font_size: i32) -> i32 ---;
 
 	// Measure string size for Font
 	@(link_name="MeasureTextEx")
@@ -2001,11 +2001,11 @@ foreign raylib
 
 	// Get index position for a unicode character on font
 	@(link_name="GetGlyphIndex")
-	get_glyph_index :: proc(font: Font, codepoint: int) -> int ---;
+	get_glyph_index :: proc(font: Font, codepoint: i32) -> i32 ---;
 
 	// Copy one string to another, returns bytes copied
 	@(link_name="TextCopy")
-	text_copy :: proc(dst: ^u8, src: cstring) -> int ---;
+	text_copy :: proc(dst: ^u8, src: cstring) -> i32 ---;
 
 	// Check if two text string are equal
 	@(link_name="TextIsEqual")
@@ -2021,7 +2021,7 @@ foreign raylib
 
 	// Get a piece of a text string
 	@(link_name="TextSubtext")
-	text_subtext :: proc(text: cstring, position: int, length: int) -> cstring ---;
+	text_subtext :: proc(text: cstring, position: i32, length: i32) -> cstring ---;
 
 	// Replace text string (memory must be freed!)
 	@(link_name="TextReplace")
@@ -2029,23 +2029,23 @@ foreign raylib
 
 	// Insert text in a position (memory must be freed!)
 	@(link_name="TextInsert")
-	text_insert :: proc(text: cstring, insert: cstring, position: int) -> ^u8 ---;
+	text_insert :: proc(text: cstring, insert: cstring, position: i32) -> ^u8 ---;
 
 	// Join text strings with delimiter
 	@(link_name="TextJoin")
-	text_join :: proc(text_list: ^cstring, count: int, delimiter: cstring) -> cstring ---;
+	text_join :: proc(text_list: ^cstring, count: i32, delimiter: cstring) -> cstring ---;
 
 	// Split text into multiple strings
 	@(link_name="TextSplit")
-	text_split :: proc(text: cstring, delimiter: u8, count: ^int) -> ^cstring ---;
+	text_split :: proc(text: cstring, delimiter: u8, count: ^i32) -> ^cstring ---;
 
 	// Append text at specific position and move cursor!
 	@(link_name="TextAppend")
-	text_append :: proc(text: ^u8, append: cstring, position: ^int) ---;
+	text_append :: proc(text: ^u8, append: cstring, position: ^i32) ---;
 
 	// Find first text occurrence within a string
 	@(link_name="TextFindIndex")
-	text_find_index :: proc(text: cstring, find: cstring) -> int ---;
+	text_find_index :: proc(text: cstring, find: cstring) -> i32 ---;
 
 	// Get upper case version of provided string
 	@(link_name="TextToUpper")
@@ -2061,27 +2061,27 @@ foreign raylib
 
 	// Get integer value from text (negative values not supported)
 	@(link_name="TextToInteger")
-	text_to_integer :: proc(text: cstring) -> int ---;
+	text_to_integer :: proc(text: cstring) -> i32 ---;
 
 	// Encode text codepoint into utf8 text (memory must be freed!)
 	@(link_name="TextToUtf8")
-	text_to_utf8 :: proc(codepoints: ^int, length: int) -> ^u8 ---;
+	text_to_utf8 :: proc(codepoints: ^i32, length: i32) -> ^u8 ---;
 
 	// Get all codepoints in a string, codepoints count returned by parameters
 	@(link_name="GetCodepoints")
-	get_codepoints :: proc(text: cstring, count: ^int) -> ^int ---;
+	get_codepoints :: proc(text: cstring, count: ^i32) -> ^i32 ---;
 
 	// Get total number of characters (codepoints) in a UTF8 encoded string
 	@(link_name="GetCodepointsCount")
-	get_codepoints_count :: proc(text: cstring) -> int ---;
+	get_codepoints_count :: proc(text: cstring) -> i32 ---;
 
 	// Returns next codepoint in a UTF8 encoded string; 0x3f('?') is returned on failure
 	@(link_name="GetNextCodepoint")
-	get_next_codepoint :: proc(text: cstring, bytes_processed: ^int) -> int ---;
+	get_next_codepoint :: proc(text: cstring, bytes_processed: ^i32) -> i32 ---;
 
 	// Encode codepoint into utf8 text (char array length returned as parameter)
 	@(link_name="CodepointToUtf8")
-	codepoint_to_utf8 :: proc(codepoint: int, byte_length: ^int) -> cstring ---;
+	codepoint_to_utf8 :: proc(codepoint: i32, byte_length: ^i32) -> cstring ---;
 
 	// Draw a line in 3D world space
 	@(link_name="DrawLine3D")
@@ -2101,7 +2101,7 @@ foreign raylib
 
 	// Draw a triangle strip defined by points
 	@(link_name="DrawTriangleStrip3D")
-	draw_triangle_strip3d :: proc(points: ^Vector3, points_count: int, color: Color) ---;
+	draw_triangle_strip3d :: proc(points: ^Vector3, points_count: i32, color: Color) ---;
 
 	// Draw cube
 	@(link_name="DrawCube")
@@ -2129,19 +2129,19 @@ foreign raylib
 
 	// Draw sphere with extended parameters
 	@(link_name="DrawSphereEx")
-	draw_sphere_ex :: proc(center_pos: Vector3, radius: f32, rings: int, slices: int, color: Color) ---;
+	draw_sphere_ex :: proc(center_pos: Vector3, radius: f32, rings: i32, slices: i32, color: Color) ---;
 
 	// Draw sphere wires
 	@(link_name="DrawSphereWires")
-	draw_sphere_wires :: proc(center_pos: Vector3, radius: f32, rings: int, slices: int, color: Color) ---;
+	draw_sphere_wires :: proc(center_pos: Vector3, radius: f32, rings: i32, slices: i32, color: Color) ---;
 
 	// Draw a cylinder/cone
 	@(link_name="DrawCylinder")
-	draw_cylinder :: proc(position: Vector3, radius_top: f32, radius_bottom: f32, height: f32, slices: int, color: Color) ---;
+	draw_cylinder :: proc(position: Vector3, radius_top: f32, radius_bottom: f32, height: f32, slices: i32, color: Color) ---;
 
 	// Draw a cylinder/cone wires
 	@(link_name="DrawCylinderWires")
-	draw_cylinder_wires :: proc(position: Vector3, radius_top: f32, radius_bottom: f32, height: f32, slices: int, color: Color) ---;
+	draw_cylinder_wires :: proc(position: Vector3, radius_top: f32, radius_bottom: f32, height: f32, slices: i32, color: Color) ---;
 
 	// Draw a plane XZ
 	@(link_name="DrawPlane")
@@ -2153,7 +2153,7 @@ foreign raylib
 
 	// Draw a grid (centered at (0, 0, 0))
 	@(link_name="DrawGrid")
-	draw_grid :: proc(slices: int, spacing: f32) ---;
+	draw_grid :: proc(slices: i32, spacing: f32) ---;
 
 	// Load model from files (meshes and materials)
 	@(link_name="LoadModel")
@@ -2177,7 +2177,7 @@ foreign raylib
 
 	// Update mesh vertex data in GPU for a specific buffer index
 	@(link_name="UpdateMeshBuffer")
-	update_mesh_buffer :: proc(mesh: Mesh, index: int, data: rawptr, data_size: int, offset: int) ---;
+	update_mesh_buffer :: proc(mesh: Mesh, index: i32, data: rawptr, data_size: i32, offset: i32) ---;
 
 	// Draw a 3d mesh with material and transform
 	@(link_name="DrawMesh")
@@ -2185,7 +2185,7 @@ foreign raylib
 
 	// Draw multiple mesh instances with material and different transforms
 	@(link_name="DrawMeshInstanced")
-	draw_mesh_instanced :: proc(mesh: Mesh, material: Material, transforms: ^Matrix, instances: int) ---;
+	draw_mesh_instanced :: proc(mesh: Mesh, material: Material, transforms: ^Matrix, instances: i32) ---;
 
 	// Unload mesh data from CPU and GPU
 	@(link_name="UnloadMesh")
@@ -2197,7 +2197,7 @@ foreign raylib
 
 	// Load materials from model file
 	@(link_name="LoadMaterials")
-	load_materials :: proc(file_name: cstring, material_count: ^int) -> ^Material ---;
+	load_materials :: proc(file_name: cstring, material_count: ^i32) -> ^Material ---;
 
 	// Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
 	@(link_name="LoadMaterialDefault")
@@ -2209,19 +2209,19 @@ foreign raylib
 
 	// Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
 	@(link_name="SetMaterialTexture")
-	set_material_texture :: proc(material: ^Material, map_type: int, texture: Texture2d) ---;
+	set_material_texture :: proc(material: ^Material, map_type: i32, texture: Texture2d) ---;
 
 	// Set material for a mesh
 	@(link_name="SetModelMeshMaterial")
-	set_model_mesh_material :: proc(model: ^Model, mesh_id: int, material_id: int) ---;
+	set_model_mesh_material :: proc(model: ^Model, mesh_id: i32, material_id: i32) ---;
 
 	// Load model animations from file
 	@(link_name="LoadModelAnimations")
-	load_model_animations :: proc(file_name: cstring, anims_count: ^int) -> ^Model_Animation ---;
+	load_model_animations :: proc(file_name: cstring, anims_count: ^i32) -> ^Model_Animation ---;
 
 	// Update model animation pose
 	@(link_name="UpdateModelAnimation")
-	update_model_animation :: proc(model: Model, anim: Model_Animation, frame: int) ---;
+	update_model_animation :: proc(model: Model, anim: Model_Animation, frame: i32) ---;
 
 	// Unload animation data
 	@(link_name="UnloadModelAnimation")
@@ -2237,11 +2237,11 @@ foreign raylib
 
 	// Generate polygonal mesh
 	@(link_name="GenMeshPoly")
-	gen_mesh_poly :: proc(sides: int, radius: f32) -> Mesh ---;
+	gen_mesh_poly :: proc(sides: i32, radius: f32) -> Mesh ---;
 
 	// Generate plane mesh (with subdivisions)
 	@(link_name="GenMeshPlane")
-	gen_mesh_plane :: proc(width: f32, length: f32, res_x: int, res_z: int) -> Mesh ---;
+	gen_mesh_plane :: proc(width: f32, length: f32, res_x: i32, res_z: i32) -> Mesh ---;
 
 	// Generate cuboid mesh
 	@(link_name="GenMeshCube")
@@ -2249,23 +2249,23 @@ foreign raylib
 
 	// Generate sphere mesh (standard sphere)
 	@(link_name="GenMeshSphere")
-	gen_mesh_sphere :: proc(radius: f32, rings: int, slices: int) -> Mesh ---;
+	gen_mesh_sphere :: proc(radius: f32, rings: i32, slices: i32) -> Mesh ---;
 
 	// Generate half-sphere mesh (no bottom cap)
 	@(link_name="GenMeshHemiSphere")
-	gen_mesh_hemi_sphere :: proc(radius: f32, rings: int, slices: int) -> Mesh ---;
+	gen_mesh_hemi_sphere :: proc(radius: f32, rings: i32, slices: i32) -> Mesh ---;
 
 	// Generate cylinder mesh
 	@(link_name="GenMeshCylinder")
-	gen_mesh_cylinder :: proc(radius: f32, height: f32, slices: int) -> Mesh ---;
+	gen_mesh_cylinder :: proc(radius: f32, height: f32, slices: i32) -> Mesh ---;
 
 	// Generate torus mesh
 	@(link_name="GenMeshTorus")
-	gen_mesh_torus :: proc(radius: f32, size: f32, rad_seg: int, sides: int) -> Mesh ---;
+	gen_mesh_torus :: proc(radius: f32, size: f32, rad_seg: i32, sides: i32) -> Mesh ---;
 
 	// Generate trefoil knot mesh
 	@(link_name="GenMeshKnot")
-	gen_mesh_knot :: proc(radius: f32, size: f32, rad_seg: int, sides: int) -> Mesh ---;
+	gen_mesh_knot :: proc(radius: f32, size: f32, rad_seg: i32, sides: i32) -> Mesh ---;
 
 	// Generate heightmap mesh from image data
 	@(link_name="GenMeshHeightmap")
@@ -2377,7 +2377,7 @@ foreign raylib
 
 	// Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
 	@(link_name="LoadWaveFromMemory")
-	load_wave_from_memory :: proc(file_type: cstring, file_data: ^u8, data_size: int) -> Wave ---;
+	load_wave_from_memory :: proc(file_type: cstring, file_data: ^u8, data_size: i32) -> Wave ---;
 
 	// Load sound from file
 	@(link_name="LoadSound")
@@ -2389,7 +2389,7 @@ foreign raylib
 
 	// Update sound buffer with new data
 	@(link_name="UpdateSound")
-	update_sound :: proc(sound: Sound, data: rawptr, samples_count: int) ---;
+	update_sound :: proc(sound: Sound, data: rawptr, samples_count: i32) ---;
 
 	// Unload wave data
 	@(link_name="UnloadWave")
@@ -2433,7 +2433,7 @@ foreign raylib
 
 	// Get number of sounds playing in the multichannel
 	@(link_name="GetSoundsPlaying")
-	get_sounds_playing :: proc() -> int ---;
+	get_sounds_playing :: proc() -> i32 ---;
 
 	// Check if a sound is currently playing
 	@(link_name="IsSoundPlaying")
@@ -2449,7 +2449,7 @@ foreign raylib
 
 	// Convert wave data to desired format
 	@(link_name="WaveFormat")
-	wave_format :: proc(wave: ^Wave, sample_rate: int, sample_size: int, channels: int) ---;
+	wave_format :: proc(wave: ^Wave, sample_rate: i32, sample_size: i32, channels: i32) ---;
 
 	// Copy a wave to a new wave
 	@(link_name="WaveCopy")
@@ -2457,7 +2457,7 @@ foreign raylib
 
 	// Crop a wave to defined samples range
 	@(link_name="WaveCrop")
-	wave_crop :: proc(wave: ^Wave, init_sample: int, final_sample: int) ---;
+	wave_crop :: proc(wave: ^Wave, init_sample: i32, final_sample: i32) ---;
 
 	// Load samples data from wave as a floats array
 	@(link_name="LoadWaveSamples")
@@ -2473,7 +2473,7 @@ foreign raylib
 
 	// Load music stream from data
 	@(link_name="LoadMusicStreamFromMemory")
-	load_music_stream_from_memory :: proc(file_type: cstring, data: ^u8, data_size: int) -> Music ---;
+	load_music_stream_from_memory :: proc(file_type: cstring, data: ^u8, data_size: i32) -> Music ---;
 
 	// Unload music stream
 	@(link_name="UnloadMusicStream")
@@ -2529,7 +2529,7 @@ foreign raylib
 
 	// Update audio stream buffers with data
 	@(link_name="UpdateAudioStream")
-	update_audio_stream :: proc(stream: Audio_Stream, data: rawptr, samples_count: int) ---;
+	update_audio_stream :: proc(stream: Audio_Stream, data: rawptr, samples_count: i32) ---;
 
 	// Check if any audio stream buffers requires refill
 	@(link_name="IsAudioStreamProcessed")
@@ -2565,5 +2565,5 @@ foreign raylib
 
 	// Default size for new audio streams
 	@(link_name="SetAudioStreamBufferSizeDefault")
-	set_audio_stream_buffer_size_default :: proc(size: int) ---;
+	set_audio_stream_buffer_size_default :: proc(size: i32) ---;
 }

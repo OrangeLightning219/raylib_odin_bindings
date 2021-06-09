@@ -14,9 +14,6 @@ for /f "tokens=1,2 delims=/" %%a in ("%1") do (
     set exe_path=%out_path%/%%b.exe
 )
 
-echo source %source_path%
-echo out %exe_path%
-
 odin build %source_path% -out="%exe_path%"
 set current_dir=%cd%
 cd %out_path%

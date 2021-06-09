@@ -21,7 +21,7 @@ types := map[string]string{
 	"unsigned char" = "u8",
 	"short" = "i16",
 	"unsigned short" = "u16",
-	"int" = "int",
+	"int" = "i32",
 	"unsigned int" = "u32",
 	"long" = "i32" when (ODIN_OS == "windows" || size_of(builtin.rawptr) == 4) else "i64",
 	"unsigned long" = "u32" when (ODIN_OS == "windows" || size_of(builtin.rawptr) == 4) else "u64",

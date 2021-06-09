@@ -1,5 +1,6 @@
 package rl_textures
 import rl "../../raylib"
+import "core:fmt"
 
 MAX_BUNNIES :: 50000;    // 50K bunnies limit
 
@@ -19,8 +20,8 @@ main :: proc()
     using rl;
     // Initialization
     //--------------------------------------------------------------------------------------
-    screen_width := 800;
-    screen_height := 450;
+    screen_width ::  1920;
+    screen_height :: 1080;
 
     init_window(screen_width, screen_height, "raylib [textures] example - bunnymark");
 
@@ -41,7 +42,7 @@ main :: proc()
     {
         // Update
         //----------------------------------------------------------------------------------
-        if is_mouse_button_down(cast(int)Mouse_Button.MOUSE_BUTTON_LEFT)
+        if is_mouse_button_down(cast(i32)Mouse_Button.MOUSE_BUTTON_LEFT)
         {
             // Create more bunnies
             for i in 0..<100
@@ -91,7 +92,7 @@ main :: proc()
             // Process of sending data is costly and it could happen that GPU data has not been completely
             // processed for drawing while new data is tried to be sent (updating current in-use buffers)
             // it could generates a stall and consequently a frame drop, limiting the number of drawn bunnies
-            draw_texture(tex_bunny, cast(int)bunnies[i].position.x, cast(int)bunnies[i].position.y, bunnies[i].color);
+            draw_texture(tex_bunny, cast(i32)bunnies[i].position.x, cast(i32)bunnies[i].position.y, bunnies[i].color);
         }
 
         draw_rectangle(0, 0, screen_width, 40, BLACK); //BLACK
