@@ -85,7 +85,7 @@ main :: proc()
 
         draw_text("PRESS SPACE to PLAY MODEL ANIMATION", 10, 10, 20, MAROON);
         draw_text("SHIFT + MMB to MOVE AROUND", 10, 30, 20, MAROON);
-        draw_text("SHIFT + ALT to ROTATE", 10, 50, 20, MAROON);
+        draw_text("ALT + MMB to ROTATE", 10, 50, 20, MAROON);
         draw_text("(c) Guy IQM 3D model by @culacant", screenWidth - 200, screenHeight - 20, 10, GRAY);
 
         //----------------------------------------------------------------------------------

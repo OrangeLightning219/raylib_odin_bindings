@@ -472,7 +472,6 @@ Mouse_Button :: enum
 	MOUSE_BUTTON_EXTRA = 4,
 	MOUSE_BUTTON_FORWARD = 5,
 	MOUSE_BUTTON_BACK = 6,
-	MOUSE_BUTTON_MAX = 7,
 };
 
 Mouse_Cursor :: enum
@@ -531,10 +530,10 @@ Material_Map_Index :: enum
 	MATERIAL_MAP_OCCLUSION = 4,
 	MATERIAL_MAP_EMISSION = 5,
 	MATERIAL_MAP_HEIGHT = 6,
-	MATERIAL_MAP_BRDG = 7,
-	MATERIAL_MAP_CUBEMAP = 8,
-	MATERIAL_MAP_IRRADIANCE = 9,
-	MATERIAL_MAP_PREFILTER = 10,
+	MATERIAL_MAP_CUBEMAP = 7,
+	MATERIAL_MAP_IRRADIANCE = 8,
+	MATERIAL_MAP_PREFILTER = 9,
+	MATERIAL_MAP_BRDG = 10,
 };
 
 Shader_Location_Index :: enum
@@ -578,6 +577,14 @@ Shader_Uniform_Data_Type :: enum
 	SHADER_UNIFORM_IVEC3 = 6,
 	SHADER_UNIFORM_IVEC4 = 7,
 	SHADER_UNIFORM_SAMPLER2D = 8,
+};
+
+Shader_Attribute_Data_Type :: enum
+{
+	SHADER_ATTRIB_FLOAT = 0,
+	SHADER_ATTRIB_VEC2 = 1,
+	SHADER_ATTRIB_VEC3 = 2,
+	SHADER_ATTRIB_VEC4 = 3,
 };
 
 Pixel_Format :: enum
@@ -979,31 +986,31 @@ foreign raylib
 	@(link_name="UnloadShader")
 	unload_shader :: proc(shader: Shader) ---;
 
-	// Returns a ray trace from mouse position
+	// Get a ray trace from mouse position
 	@(link_name="GetMouseRay")
 	get_mouse_ray :: proc(mouse_position: Vector2, camera: Camera) -> Ray ---;
 
-	// Returns camera transform matrix (view matrix)
+	// Get camera transform matrix (view matrix)
 	@(link_name="GetCameraMatrix")
 	get_camera_matrix :: proc(camera: Camera) -> Matrix ---;
 
-	// Returns camera 2d transform matrix
+	// Get camera 2d transform matrix
 	@(link_name="GetCameraMatrix2D")
 	get_camera_matrix2d :: proc(camera: Camera2d) -> Matrix ---;
 
-	// Returns the screen space position for a 3d world space position
+	// Get the screen space position for a 3d world space position
 	@(link_name="GetWorldToScreen")
 	get_world_to_screen :: proc(position: Vector3, camera: Camera) -> Vector2 ---;
 
-	// Returns size position for a 3d world space position
+	// Get size position for a 3d world space position
 	@(link_name="GetWorldToScreenEx")
 	get_world_to_screen_ex :: proc(position: Vector3, camera: Camera, width: i32, height: i32) -> Vector2 ---;
 
-	// Returns the screen space position for a 2d camera world space position
+	// Get the screen space position for a 2d camera world space position
 	@(link_name="GetWorldToScreen2D")
 	get_world_to_screen2d :: proc(position: Vector2, camera: Camera2d) -> Vector2 ---;
 
-	// Returns the world space position for a 2d camera screen space position
+	// Get the world space position for a 2d camera screen space position
 	@(link_name="GetScreenToWorld2D")
 	get_screen_to_world2d :: proc(position: Vector2, camera: Camera2d) -> Vector2 ---;
 
@@ -1011,19 +1018,19 @@ foreign raylib
 	@(link_name="SetTargetFPS")
 	set_target_fps :: proc(fps: i32) ---;
 
-	// Returns current FPS
+	// Get current FPS
 	@(link_name="GetFPS")
 	get_fps :: proc() -> i32 ---;
 
-	// Returns time in seconds for last frame drawn (delta time)
+	// Get time in seconds for last frame drawn (delta time)
 	@(link_name="GetFrameTime")
 	get_frame_time :: proc() -> f32 ---;
 
-	// Returns elapsed time in seconds since InitWindow()
+	// Get elapsed time in seconds since InitWindow()
 	@(link_name="GetTime")
 	get_time :: proc() -> f64 ---;
 
-	// Returns a random value between min and max (both included)
+	// Get a random value between min and max (both included)
 	@(link_name="GetRandomValue")
 	get_random_value :: proc(min: i32, max: i32) -> i32 ---;
 
@@ -1183,19 +1190,19 @@ foreign raylib
 	@(link_name="OpenURL")
 	open_url :: proc(url: cstring) ---;
 
-	// Detect if a key has been pressed once
+	// Check if a key has been pressed once
 	@(link_name="IsKeyPressed")
 	is_key_pressed :: proc(key: i32) -> bool ---;
 
-	// Detect if a key is being pressed
+	// Check if a key is being pressed
 	@(link_name="IsKeyDown")
 	is_key_down :: proc(key: i32) -> bool ---;
 
-	// Detect if a key has been released once
+	// Check if a key has been released once
 	@(link_name="IsKeyReleased")
 	is_key_released :: proc(key: i32) -> bool ---;
 
-	// Detect if a key is NOT being pressed
+	// Check if a key is NOT being pressed
 	@(link_name="IsKeyUp")
 	is_key_up :: proc(key: i32) -> bool ---;
 
@@ -1211,7 +1218,7 @@ foreign raylib
 	@(link_name="GetCharPressed")
 	get_char_pressed :: proc() -> i32 ---;
 
-	// Detect if a gamepad is available
+	// Check if a gamepad is available
 	@(link_name="IsGamepadAvailable")
 	is_gamepad_available :: proc(gamepad: i32) -> bool ---;
 
@@ -1219,23 +1226,23 @@ foreign raylib
 	@(link_name="IsGamepadName")
 	is_gamepad_name :: proc(gamepad: i32, name: cstring) -> bool ---;
 
-	// Return gamepad internal name id
+	// Get gamepad internal name id
 	@(link_name="GetGamepadName")
 	get_gamepad_name :: proc(gamepad: i32) -> cstring ---;
 
-	// Detect if a gamepad button has been pressed once
+	// Check if a gamepad button has been pressed once
 	@(link_name="IsGamepadButtonPressed")
 	is_gamepad_button_pressed :: proc(gamepad: i32, button: i32) -> bool ---;
 
-	// Detect if a gamepad button is being pressed
+	// Check if a gamepad button is being pressed
 	@(link_name="IsGamepadButtonDown")
 	is_gamepad_button_down :: proc(gamepad: i32, button: i32) -> bool ---;
 
-	// Detect if a gamepad button has been released once
+	// Check if a gamepad button has been released once
 	@(link_name="IsGamepadButtonReleased")
 	is_gamepad_button_released :: proc(gamepad: i32, button: i32) -> bool ---;
 
-	// Detect if a gamepad button is NOT being pressed
+	// Check if a gamepad button is NOT being pressed
 	@(link_name="IsGamepadButtonUp")
 	is_gamepad_button_up :: proc(gamepad: i32, button: i32) -> bool ---;
 
@@ -1243,11 +1250,11 @@ foreign raylib
 	@(link_name="GetGamepadButtonPressed")
 	get_gamepad_button_pressed :: proc() -> i32 ---;
 
-	// Return gamepad axis count for a gamepad
+	// Get gamepad axis count for a gamepad
 	@(link_name="GetGamepadAxisCount")
 	get_gamepad_axis_count :: proc(gamepad: i32) -> i32 ---;
 
-	// Return axis movement value for a gamepad axis
+	// Get axis movement value for a gamepad axis
 	@(link_name="GetGamepadAxisMovement")
 	get_gamepad_axis_movement :: proc(gamepad: i32, axis: i32) -> f32 ---;
 
@@ -1255,31 +1262,31 @@ foreign raylib
 	@(link_name="SetGamepadMappings")
 	set_gamepad_mappings :: proc(mappings: cstring) -> i32 ---;
 
-	// Detect if a mouse button has been pressed once
+	// Check if a mouse button has been pressed once
 	@(link_name="IsMouseButtonPressed")
 	is_mouse_button_pressed :: proc(button: i32) -> bool ---;
 
-	// Detect if a mouse button is being pressed
+	// Check if a mouse button is being pressed
 	@(link_name="IsMouseButtonDown")
 	is_mouse_button_down :: proc(button: i32) -> bool ---;
 
-	// Detect if a mouse button has been released once
+	// Check if a mouse button has been released once
 	@(link_name="IsMouseButtonReleased")
 	is_mouse_button_released :: proc(button: i32) -> bool ---;
 
-	// Detect if a mouse button is NOT being pressed
+	// Check if a mouse button is NOT being pressed
 	@(link_name="IsMouseButtonUp")
 	is_mouse_button_up :: proc(button: i32) -> bool ---;
 
-	// Returns mouse position X
+	// Get mouse position X
 	@(link_name="GetMouseX")
 	get_mouse_x :: proc() -> i32 ---;
 
-	// Returns mouse position Y
+	// Get mouse position Y
 	@(link_name="GetMouseY")
 	get_mouse_y :: proc() -> i32 ---;
 
-	// Returns mouse position XY
+	// Get mouse position XY
 	@(link_name="GetMousePosition")
 	get_mouse_position :: proc() -> Vector2 ---;
 
@@ -1295,7 +1302,7 @@ foreign raylib
 	@(link_name="SetMouseScale")
 	set_mouse_scale :: proc(scale_x: f32, scale_y: f32) ---;
 
-	// Returns mouse wheel movement Y
+	// Get mouse wheel movement Y
 	@(link_name="GetMouseWheelMove")
 	get_mouse_wheel_move :: proc() -> f32 ---;
 
@@ -1303,15 +1310,15 @@ foreign raylib
 	@(link_name="SetMouseCursor")
 	set_mouse_cursor :: proc(cursor: i32) ---;
 
-	// Returns touch position X for touch point 0 (relative to screen size)
+	// Get touch position X for touch point 0 (relative to screen size)
 	@(link_name="GetTouchX")
 	get_touch_x :: proc() -> i32 ---;
 
-	// Returns touch position Y for touch point 0 (relative to screen size)
+	// Get touch position Y for touch point 0 (relative to screen size)
 	@(link_name="GetTouchY")
 	get_touch_y :: proc() -> i32 ---;
 
-	// Returns touch position XY for a touch point index (relative to screen size)
+	// Get touch position XY for a touch point index (relative to screen size)
 	@(link_name="GetTouchPosition")
 	get_touch_position :: proc(index: i32) -> Vector2 ---;
 
@@ -1883,35 +1890,35 @@ foreign raylib
 	@(link_name="DrawTexturePoly")
 	draw_texture_poly :: proc(texture: Texture2d, center: Vector2, points: ^Vector2, texcoords: ^Vector2, points_count: i32, tint: Color) ---;
 
-	// Returns color with alpha applied, alpha goes from 0.0f to 1.0f
+	// Get color with alpha applied, alpha goes from 0.0f to 1.0f
 	@(link_name="Fade")
 	fade :: proc(color: Color, alpha: f32) -> Color ---;
 
-	// Returns hexadecimal value for a Color
+	// Get hexadecimal value for a Color
 	@(link_name="ColorToInt")
 	color_to_int :: proc(color: Color) -> i32 ---;
 
-	// Returns Color normalized as float [0..1]
+	// Get Color normalized as float [0..1]
 	@(link_name="ColorNormalize")
 	color_normalize :: proc(color: Color) -> Vector4 ---;
 
-	// Returns Color from normalized values [0..1]
+	// Get Color from normalized values [0..1]
 	@(link_name="ColorFromNormalized")
 	color_from_normalized :: proc(normalized: Vector4) -> Color ---;
 
-	// Returns HSV values for a Color, hue [0..360], saturation/value [0..1]
+	// Get HSV values for a Color, hue [0..360], saturation/value [0..1]
 	@(link_name="ColorToHSV")
 	color_to_hsv :: proc(color: Color) -> Vector3 ---;
 
-	// Returns a Color from HSV values, hue [0..360], saturation/value [0..1]
+	// Get a Color from HSV values, hue [0..360], saturation/value [0..1]
 	@(link_name="ColorFromHSV")
 	color_from_hsv :: proc(hue: f32, saturation: f32, value: f32) -> Color ---;
 
-	// Returns color with alpha applied, alpha goes from 0.0f to 1.0f
+	// Get color with alpha applied, alpha goes from 0.0f to 1.0f
 	@(link_name="ColorAlpha")
 	color_alpha :: proc(color: Color, alpha: f32) -> Color ---;
 
-	// Returns src alpha-blended into dst color with tint
+	// Get src alpha-blended into dst color with tint
 	@(link_name="ColorAlphaBlend")
 	color_alpha_blend :: proc(dst: Color, src: Color, tint: Color) -> Color ---;
 
@@ -2075,7 +2082,7 @@ foreign raylib
 	@(link_name="GetCodepointsCount")
 	get_codepoints_count :: proc(text: cstring) -> i32 ---;
 
-	// Returns next codepoint in a UTF8 encoded string; 0x3f('?') is returned on failure
+	// Get next codepoint in a UTF8 encoded string; 0x3f('?') is returned on failure
 	@(link_name="GetNextCodepoint")
 	get_next_codepoint :: proc(text: cstring, bytes_processed: ^i32) -> i32 ---;
 
@@ -2319,15 +2326,15 @@ foreign raylib
 	@(link_name="DrawBillboardPro")
 	draw_billboard_pro :: proc(camera: Camera, texture: Texture2d, source: Rectangle, position: Vector3, size: Vector2, origin: Vector2, rotation: f32, tint: Color) ---;
 
-	// Detect collision between two spheres
+	// Check collision between two spheres
 	@(link_name="CheckCollisionSpheres")
 	check_collision_spheres :: proc(center1: Vector3, radius1: f32, center2: Vector3, radius2: f32) -> bool ---;
 
-	// Detect collision between two bounding boxes
+	// Check collision between two bounding boxes
 	@(link_name="CheckCollisionBoxes")
 	check_collision_boxes :: proc(box1: Bounding_Box, box2: Bounding_Box) -> bool ---;
 
-	// Detect collision between box and sphere
+	// Check collision between box and sphere
 	@(link_name="CheckCollisionBoxSphere")
 	check_collision_box_sphere :: proc(box: Bounding_Box, center: Vector3, radius: f32) -> bool ---;
 

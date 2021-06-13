@@ -1619,11 +1619,6 @@
           "name": "MOUSE_BUTTON_BACK",
           "value": 6,
           "description": ""
-        },
-        {
-          "name": "MOUSE_BUTTON_MAX",
-          "value": 7,
-          "description": ""
         }
       ]
     },
@@ -1860,22 +1855,22 @@
           "description": ""
         },
         {
-          "name": "MATERIAL_MAP_BRDG",
+          "name": "MATERIAL_MAP_CUBEMAP",
           "value": 7,
           "description": ""
         },
         {
-          "name": "MATERIAL_MAP_CUBEMAP",
+          "name": "MATERIAL_MAP_IRRADIANCE",
           "value": 8,
           "description": ""
         },
         {
-          "name": "MATERIAL_MAP_IRRADIANCE",
+          "name": "MATERIAL_MAP_PREFILTER",
           "value": 9,
           "description": ""
         },
         {
-          "name": "MATERIAL_MAP_PREFILTER",
+          "name": "MATERIAL_MAP_BRDG",
           "value": 10,
           "description": ""
         }
@@ -2064,6 +2059,32 @@
         {
           "name": "SHADER_UNIFORM_SAMPLER2D",
           "value": 8,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "ShaderAttributeDataType",
+      "description": "",
+      "values": [
+        {
+          "name": "SHADER_ATTRIB_FLOAT",
+          "value": 0,
+          "description": ""
+        },
+        {
+          "name": "SHADER_ATTRIB_VEC2",
+          "value": 1,
+          "description": ""
+        },
+        {
+          "name": "SHADER_ATTRIB_VEC3",
+          "value": 2,
+          "description": ""
+        },
+        {
+          "name": "SHADER_ATTRIB_VEC4",
+          "value": 3,
           "description": ""
         }
       ]
@@ -2966,7 +2987,7 @@
     },
     {
       "name": "GetMouseRay",
-      "description": "Returns a ray trace from mouse position",
+      "description": "Get a ray trace from mouse position",
       "returnType": "Ray",
       "params": {
         "mousePosition": "Vector2",
@@ -2975,7 +2996,7 @@
     },
     {
       "name": "GetCameraMatrix",
-      "description": "Returns camera transform matrix (view matrix)",
+      "description": "Get camera transform matrix (view matrix)",
       "returnType": "Matrix",
       "params": {
         "camera": "Camera"
@@ -2983,7 +3004,7 @@
     },
     {
       "name": "GetCameraMatrix2D",
-      "description": "Returns camera 2d transform matrix",
+      "description": "Get camera 2d transform matrix",
       "returnType": "Matrix",
       "params": {
         "camera": "Camera2D"
@@ -2991,7 +3012,7 @@
     },
     {
       "name": "GetWorldToScreen",
-      "description": "Returns the screen space position for a 3d world space position",
+      "description": "Get the screen space position for a 3d world space position",
       "returnType": "Vector2",
       "params": {
         "position": "Vector3",
@@ -3000,7 +3021,7 @@
     },
     {
       "name": "GetWorldToScreenEx",
-      "description": "Returns size position for a 3d world space position",
+      "description": "Get size position for a 3d world space position",
       "returnType": "Vector2",
       "params": {
         "position": "Vector3",
@@ -3011,7 +3032,7 @@
     },
     {
       "name": "GetWorldToScreen2D",
-      "description": "Returns the screen space position for a 2d camera world space position",
+      "description": "Get the screen space position for a 2d camera world space position",
       "returnType": "Vector2",
       "params": {
         "position": "Vector2",
@@ -3020,7 +3041,7 @@
     },
     {
       "name": "GetScreenToWorld2D",
-      "description": "Returns the world space position for a 2d camera screen space position",
+      "description": "Get the world space position for a 2d camera screen space position",
       "returnType": "Vector2",
       "params": {
         "position": "Vector2",
@@ -3037,22 +3058,22 @@
     },
     {
       "name": "GetFPS",
-      "description": "Returns current FPS",
+      "description": "Get current FPS",
       "returnType": "int"
     },
     {
       "name": "GetFrameTime",
-      "description": "Returns time in seconds for last frame drawn (delta time)",
+      "description": "Get time in seconds for last frame drawn (delta time)",
       "returnType": "float"
     },
     {
       "name": "GetTime",
-      "description": "Returns elapsed time in seconds since InitWindow()",
+      "description": "Get elapsed time in seconds since InitWindow()",
       "returnType": "double"
     },
     {
       "name": "GetRandomValue",
-      "description": "Returns a random value between min and max (both included)",
+      "description": "Get a random value between min and max (both included)",
       "returnType": "int",
       "params": {
         "min": "int",
@@ -3375,7 +3396,7 @@
     },
     {
       "name": "IsKeyPressed",
-      "description": "Detect if a key has been pressed once",
+      "description": "Check if a key has been pressed once",
       "returnType": "bool",
       "params": {
         "key": "int"
@@ -3383,7 +3404,7 @@
     },
     {
       "name": "IsKeyDown",
-      "description": "Detect if a key is being pressed",
+      "description": "Check if a key is being pressed",
       "returnType": "bool",
       "params": {
         "key": "int"
@@ -3391,7 +3412,7 @@
     },
     {
       "name": "IsKeyReleased",
-      "description": "Detect if a key has been released once",
+      "description": "Check if a key has been released once",
       "returnType": "bool",
       "params": {
         "key": "int"
@@ -3399,7 +3420,7 @@
     },
     {
       "name": "IsKeyUp",
-      "description": "Detect if a key is NOT being pressed",
+      "description": "Check if a key is NOT being pressed",
       "returnType": "bool",
       "params": {
         "key": "int"
@@ -3425,7 +3446,7 @@
     },
     {
       "name": "IsGamepadAvailable",
-      "description": "Detect if a gamepad is available",
+      "description": "Check if a gamepad is available",
       "returnType": "bool",
       "params": {
         "gamepad": "int"
@@ -3442,7 +3463,7 @@
     },
     {
       "name": "GetGamepadName",
-      "description": "Return gamepad internal name id",
+      "description": "Get gamepad internal name id",
       "returnType": "const char *",
       "params": {
         "gamepad": "int"
@@ -3450,7 +3471,7 @@
     },
     {
       "name": "IsGamepadButtonPressed",
-      "description": "Detect if a gamepad button has been pressed once",
+      "description": "Check if a gamepad button has been pressed once",
       "returnType": "bool",
       "params": {
         "gamepad": "int",
@@ -3459,7 +3480,7 @@
     },
     {
       "name": "IsGamepadButtonDown",
-      "description": "Detect if a gamepad button is being pressed",
+      "description": "Check if a gamepad button is being pressed",
       "returnType": "bool",
       "params": {
         "gamepad": "int",
@@ -3468,7 +3489,7 @@
     },
     {
       "name": "IsGamepadButtonReleased",
-      "description": "Detect if a gamepad button has been released once",
+      "description": "Check if a gamepad button has been released once",
       "returnType": "bool",
       "params": {
         "gamepad": "int",
@@ -3477,7 +3498,7 @@
     },
     {
       "name": "IsGamepadButtonUp",
-      "description": "Detect if a gamepad button is NOT being pressed",
+      "description": "Check if a gamepad button is NOT being pressed",
       "returnType": "bool",
       "params": {
         "gamepad": "int",
@@ -3491,7 +3512,7 @@
     },
     {
       "name": "GetGamepadAxisCount",
-      "description": "Return gamepad axis count for a gamepad",
+      "description": "Get gamepad axis count for a gamepad",
       "returnType": "int",
       "params": {
         "gamepad": "int"
@@ -3499,7 +3520,7 @@
     },
     {
       "name": "GetGamepadAxisMovement",
-      "description": "Return axis movement value for a gamepad axis",
+      "description": "Get axis movement value for a gamepad axis",
       "returnType": "float",
       "params": {
         "gamepad": "int",
@@ -3516,7 +3537,7 @@
     },
     {
       "name": "IsMouseButtonPressed",
-      "description": "Detect if a mouse button has been pressed once",
+      "description": "Check if a mouse button has been pressed once",
       "returnType": "bool",
       "params": {
         "button": "int"
@@ -3524,7 +3545,7 @@
     },
     {
       "name": "IsMouseButtonDown",
-      "description": "Detect if a mouse button is being pressed",
+      "description": "Check if a mouse button is being pressed",
       "returnType": "bool",
       "params": {
         "button": "int"
@@ -3532,7 +3553,7 @@
     },
     {
       "name": "IsMouseButtonReleased",
-      "description": "Detect if a mouse button has been released once",
+      "description": "Check if a mouse button has been released once",
       "returnType": "bool",
       "params": {
         "button": "int"
@@ -3540,7 +3561,7 @@
     },
     {
       "name": "IsMouseButtonUp",
-      "description": "Detect if a mouse button is NOT being pressed",
+      "description": "Check if a mouse button is NOT being pressed",
       "returnType": "bool",
       "params": {
         "button": "int"
@@ -3548,17 +3569,17 @@
     },
     {
       "name": "GetMouseX",
-      "description": "Returns mouse position X",
+      "description": "Get mouse position X",
       "returnType": "int"
     },
     {
       "name": "GetMouseY",
-      "description": "Returns mouse position Y",
+      "description": "Get mouse position Y",
       "returnType": "int"
     },
     {
       "name": "GetMousePosition",
-      "description": "Returns mouse position XY",
+      "description": "Get mouse position XY",
       "returnType": "Vector2"
     },
     {
@@ -3590,7 +3611,7 @@
     },
     {
       "name": "GetMouseWheelMove",
-      "description": "Returns mouse wheel movement Y",
+      "description": "Get mouse wheel movement Y",
       "returnType": "float"
     },
     {
@@ -3603,17 +3624,17 @@
     },
     {
       "name": "GetTouchX",
-      "description": "Returns touch position X for touch point 0 (relative to screen size)",
+      "description": "Get touch position X for touch point 0 (relative to screen size)",
       "returnType": "int"
     },
     {
       "name": "GetTouchY",
-      "description": "Returns touch position Y for touch point 0 (relative to screen size)",
+      "description": "Get touch position Y for touch point 0 (relative to screen size)",
       "returnType": "int"
     },
     {
       "name": "GetTouchPosition",
-      "description": "Returns touch position XY for a touch point index (relative to screen size)",
+      "description": "Get touch position XY for a touch point index (relative to screen size)",
       "returnType": "Vector2",
       "params": {
         "index": "int"
@@ -5042,7 +5063,7 @@
     },
     {
       "name": "Fade",
-      "description": "Returns color with alpha applied, alpha goes from 0.0f to 1.0f",
+      "description": "Get color with alpha applied, alpha goes from 0.0f to 1.0f",
       "returnType": "Color",
       "params": {
         "color": "Color",
@@ -5051,7 +5072,7 @@
     },
     {
       "name": "ColorToInt",
-      "description": "Returns hexadecimal value for a Color",
+      "description": "Get hexadecimal value for a Color",
       "returnType": "int",
       "params": {
         "color": "Color"
@@ -5059,7 +5080,7 @@
     },
     {
       "name": "ColorNormalize",
-      "description": "Returns Color normalized as float [0..1]",
+      "description": "Get Color normalized as float [0..1]",
       "returnType": "Vector4",
       "params": {
         "color": "Color"
@@ -5067,7 +5088,7 @@
     },
     {
       "name": "ColorFromNormalized",
-      "description": "Returns Color from normalized values [0..1]",
+      "description": "Get Color from normalized values [0..1]",
       "returnType": "Color",
       "params": {
         "normalized": "Vector4"
@@ -5075,7 +5096,7 @@
     },
     {
       "name": "ColorToHSV",
-      "description": "Returns HSV values for a Color, hue [0..360], saturation/value [0..1]",
+      "description": "Get HSV values for a Color, hue [0..360], saturation/value [0..1]",
       "returnType": "Vector3",
       "params": {
         "color": "Color"
@@ -5083,7 +5104,7 @@
     },
     {
       "name": "ColorFromHSV",
-      "description": "Returns a Color from HSV values, hue [0..360], saturation/value [0..1]",
+      "description": "Get a Color from HSV values, hue [0..360], saturation/value [0..1]",
       "returnType": "Color",
       "params": {
         "hue": "float",
@@ -5093,7 +5114,7 @@
     },
     {
       "name": "ColorAlpha",
-      "description": "Returns color with alpha applied, alpha goes from 0.0f to 1.0f",
+      "description": "Get color with alpha applied, alpha goes from 0.0f to 1.0f",
       "returnType": "Color",
       "params": {
         "color": "Color",
@@ -5102,7 +5123,7 @@
     },
     {
       "name": "ColorAlphaBlend",
-      "description": "Returns src alpha-blended into dst color with tint",
+      "description": "Get src alpha-blended into dst color with tint",
       "returnType": "Color",
       "params": {
         "dst": "Color",
@@ -5508,7 +5529,7 @@
     },
     {
       "name": "GetNextCodepoint",
-      "description": "Returns next codepoint in a UTF8 encoded string; 0x3f('?') is returned on failure",
+      "description": "Get next codepoint in a UTF8 encoded string; 0x3f('?') is returned on failure",
       "returnType": "int",
       "params": {
         "text": "const char *",
@@ -6122,7 +6143,7 @@
     },
     {
       "name": "CheckCollisionSpheres",
-      "description": "Detect collision between two spheres",
+      "description": "Check collision between two spheres",
       "returnType": "bool",
       "params": {
         "center1": "Vector3",
@@ -6133,7 +6154,7 @@
     },
     {
       "name": "CheckCollisionBoxes",
-      "description": "Detect collision between two bounding boxes",
+      "description": "Check collision between two bounding boxes",
       "returnType": "bool",
       "params": {
         "box1": "BoundingBox",
@@ -6142,7 +6163,7 @@
     },
     {
       "name": "CheckCollisionBoxSphere",
-      "description": "Detect collision between box and sphere",
+      "description": "Check collision between box and sphere",
       "returnType": "bool",
       "params": {
         "box": "BoundingBox",
@@ -6447,7 +6468,7 @@
       "returnType": "Music",
       "params": {
         "fileType": "const char *",
-        "data": "unsigned char*",
+        "data": "unsigned char *",
         "dataSize": "int"
       }
     },
