@@ -1,6 +1,6 @@
 package rl_core
 
-import rl "raylib"
+import rl "../../raylib"
 
 MAX_COLUMNS :: 20;
 
