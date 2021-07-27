@@ -363,6 +363,7 @@ procedure_argument_type_exceptions["is_mouse_button_down"]["button"] = "Mouse_Bu
 procedure_argument_type_exceptions["is_mouse_button_released"]["button"] = "Mouse_Button";
 procedure_argument_type_exceptions["is_mouse_button_up"]["button"] = "Mouse_Button";
 
+
 // NOTE(BigChungusShrek): Not completely sure about these.
 
 procedure_argument_type_exceptions["set_config_flags"]["flags"] = "Config_Flags";
@@ -406,8 +407,16 @@ procedure_argument_type_exceptions["is_gesture_detected"]["gesture"] = "Gesture"
 
 procedure_argument_type_exceptions["set_camera_mode"]["mode"] = "Camera_Mode";
 
-// NOTE(BigChungusShrek): Camera_Projection is only used in a strut and I'm not doing structs for now. I will do them after I'm done with procedures.
-
 // TODO(BigChungusShrek): Which procs use N_Patch_Layout???
 
-// NOTE(BigChungusShrek): Now that I'm thinking about it, it could be that all of the enums that I could not find procs for are actually just only used in structs. I will find out after I commit this and start doing the structs as well.
+
+struct_member_type_exceptions: map[string][string]string;
+
+struct_member_type_exceptions["Image"]["format"] = "Pixel_Format";
+
+struct_member_type_exceptions["Texture"]["format"] = "Pixel_Format";
+
+struct_member_type_exceptions["Camera3d"]["projection"] = "Camera_Projection";
+
+// TODO(BigChungusShrek): What is the type for this? It just says audio filetype. Or is it just i32?
+//struct_member_type_exceptions["Music"]["ctx_type"] = "";
