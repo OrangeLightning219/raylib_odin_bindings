@@ -38,16 +38,16 @@ types := map[string]string{
 parse_type :: proc(type: string) -> string
 {
 	using strings;
-
+	
 	parameter_type := type;
-
+	
 	if parameter_type != "const char *"
 	{
 		ignored: bool;
 		parameter_type, ignored = remove_all(parameter_type, "const");
 		parameter_type = trim_space(parameter_type);		
 	}
-
+	
 	if parameter_type in types
 	{
 		parameter_type = types[parameter_type];
@@ -69,10 +69,10 @@ parse_type :: proc(type: string) -> string
 		{
 			temp[1] = types[temp[1]];
 		}
-
+		
 		parameter_type = concatenate(temp[:]);
 	}
-
+	
 	return to_ada_case(parameter_type);
 }
 
@@ -90,7 +90,7 @@ generate_typedefs :: proc(file: os.Handle)
 	os.write(file, transmute([]u8)callback);
 	callback = "Save_File_Text_Callback :: proc(filename: cstring, text: ^u8) -> bool;\n";
 	os.write(file, transmute([]u8)callback);
-
+	
 	color := "LIGHTGRAY :: Color {200, 200, 200, 255};\n";
 	os.write(file, transmute([]u8)color);	
 	color = "GRAY      :: Color{ 130, 130, 130, 255 };\n";
@@ -143,16 +143,16 @@ generate_typedefs :: proc(file: os.Handle)
 	os.write(file, transmute([]u8)color);
 	color = "RAYWHITE  :: Color{ 245, 245, 245, 255 };\n";
 	os.write(file, transmute([]u8)color);
-
+	
 }
 
 generate_structs :: proc(file: os.Handle, structs_json: json.Array)
 {
 	using strings;
-
+	
 	r_audio_buffer := "r_Audio_Buffer :: struct {};\n";
 	os.write(file, transmute([]u8)r_audio_buffer);
-
+	
 	for s in structs_json
 	{
 		struct_builder := make_builder_none();
@@ -165,20 +165,20 @@ generate_structs :: proc(file: os.Handle, structs_json: json.Array)
 		write_string_builder(&struct_builder, to_ada_case(struct_name));
 		write_string_builder(&struct_builder, " :: struct\n");
 		write_string_builder(&struct_builder, "{\n");
-
+		
 		for field in fields
 		{
 			field_name := field.value.(json.Object)["name"].value.(json.String);
 			field_type := field.value.(json.Object)["type"].value.(json.String);
 			field_desc := field.value.(json.Object)["description"].value.(json.String);
-
+			
 			field_type = parse_type(field_type);
 			names := split(field_name, " ");
 			for name in names
 			{
 				temp_name, _ := remove_all(name, ",");
 				final_type := field_type;
-
+				
 				bracket_index := strings.index(temp_name, "[");
 				if bracket_index != -1
 				{
@@ -188,7 +188,7 @@ generate_structs :: proc(file: os.Handle, structs_json: json.Array)
 					final_type = concatenate(temp[:]);
 					temp_name = temp_name[:bracket_index];
 				}
-
+				
 				write_string_builder(&struct_builder, "\t");
 				write_string_builder(&struct_builder, to_snake_case(temp_name));
 				write_string_builder(&struct_builder, ": ");
@@ -198,7 +198,7 @@ generate_structs :: proc(file: os.Handle, structs_json: json.Array)
 				write_string_builder(&struct_builder, "\n");
 			}
 		}
-
+		
 		write_string_builder(&struct_builder, "};\n");
 		os.write(file, transmute([]u8)to_string(struct_builder));
 	}
@@ -207,20 +207,20 @@ generate_structs :: proc(file: os.Handle, structs_json: json.Array)
 generate_enums :: proc(file: os.Handle, enums_json: json.Array)
 {
 	using strings;
-
+	
 	for e in enums_json
 	{
 		enum_builder := make_builder_none();
 		defer destroy_builder(&enum_builder);
-
+		
 		enum_name := e.value.(json.Object)["name"].value.(json.String);
 		values := e.value.(json.Object)["values"].value.(json.Array);
-
+		
 		write_string_builder(&enum_builder, "\n");
 		write_string_builder(&enum_builder, to_ada_case(enum_name));
 		write_string_builder(&enum_builder, " :: enum\n");
 		write_string_builder(&enum_builder, "{\n");
-
+		
 		for value in values
 		{
 			value_name := value.value.(json.Object)["name"].value.(json.String);
@@ -232,7 +232,7 @@ generate_enums :: proc(file: os.Handle, enums_json: json.Array)
 			write_string_builder(&enum_builder, strconv.itoa(buf[:], cast(int)enum_value));
 			write_string_builder(&enum_builder, ",\n");
 		}
-
+		
 		write_string_builder(&enum_builder, "};\n");
 		os.write(file, transmute([]u8)to_string(enum_builder));
 	}
@@ -243,11 +243,11 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 	using strings;
 	foreign_block := "\n@(default_calling_convention=\"c\")\nforeign raylib\n{\n";
 	os.write(file, transmute([]u8)foreign_block);
-
+	
 	for f in functions_json
 	{
 		function_name := f.value.(json.Object)["name"].value.(json.String);
-
+		
 		if function_name == "ShowCursor"
 		{
 			// Show cursor is colliding with another foreign function in user32.odin
@@ -255,9 +255,9 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 		}
 		function_builder := make_builder_none();
 		defer destroy_builder(&function_builder);
-
+		
 		function_desc := f.value.(json.Object)["description"].value.(json.String);
-
+		
 		write_string_builder(&function_builder, "\n");
 		write_string_builder(&function_builder, "\t// ");
 		write_string_builder(&function_builder, function_desc);
@@ -268,7 +268,7 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 		write_string_builder(&function_builder, "\")\n\t");
 		write_string_builder(&function_builder, to_snake_case(function_name));
 		write_string_builder(&function_builder, " :: proc(");
-
+		
 		has_params := f.value.(json.Object)["params"].value != nil;
 		if has_params
 		{
@@ -277,7 +277,7 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 			{
 				param_name := parameter_name;
 				type := param_type.value.(json.String);
-
+				
 				if param_name == "dynamic"
 				{
 					param_name = "_dynamic";
@@ -292,7 +292,7 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 					param_name = to_snake_case(parameter_name);
 					type = parse_type(type);
 				}
-
+				
 				write_string_builder(&function_builder, param_name);
 				write_string_builder(&function_builder, ": ");
 				write_string_builder(&function_builder, type);
@@ -305,7 +305,7 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 		write_string_builder(&function_builder, ") ");
 		
 		return_type := parse_type(f.value.(json.Object)["returnType"].value.(json.String));
-
+		
 		if return_type != "void"
 		{
 			write_string_builder(&function_builder, "-> ");
@@ -313,7 +313,7 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 			write_string_builder(&function_builder, " ");
 		}
 		write_string_builder(&function_builder, "---;\n");
-
+		
 		os.write(file, transmute([]u8)to_string(function_builder));
 	}
 	block_end := "}\n";
@@ -323,7 +323,7 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 main ::proc()
 {
 	defer delete(types);
-
+	
 	bytes, ok := os.read_entire_file("raylib_parser.json");
 	
 	raylib_json, parsed := json.parse(bytes, json.Specification.JSON, true);
@@ -331,16 +331,92 @@ main ::proc()
 	structs_json := raylib_json.value.(json.Object)["structs"].value.(json.Array);
 	enums_json := raylib_json.value.(json.Object)["enums"].value.(json.Array);
 	functions_json := raylib_json.value.(json.Object)["functions"].value.(json.Array);
-
+	
 	file, error := os.open("./raylib.odin", os.O_RDWR);
 	assert(error == 0);
 	defer os.close(file);
-
+	
 	header := "package raylib\n\nforeign import raylib \"raylib.lib\"\n\n";
 	os.write(file, transmute([]u8)header);
-
+	
 	generate_typedefs(file);
 	generate_structs(file, structs_json);
 	generate_enums(file, enums_json);
 	generate_functions(file, functions_json);
 }
+
+procedure_argument_type_exceptions: map[string][string]string;
+
+procedure_argument_type_exceptions["is_key_pressed"]["key"] = "Keyboard_Key";
+procedure_argument_type_exceptions["is_key_down"]["key"] = "Keyboard_Key";
+procedure_argument_type_exceptions["is_key_released"]["key"] = "Keyboard_Key";
+procedure_argument_type_exceptions["is_key_up"]["key"] = "Keyboard_Key";
+procedure_argument_type_exceptions["set_exit_key"]["key"] = "Keyboard_Key";
+
+procedure_argument_type_exceptions["is_gamepad_button_pressed"]["button"] = "Gamepad_Button";
+procedure_argument_type_exceptions["is_gamepad_button_down"]["button"] = "Gamepad_Button";
+procedure_argument_type_exceptions["is_gamepad_button_released"]["button"] = "Gamepad_Button";
+procedure_argument_type_exceptions["is_gamepad_button_up"]["button"] = "Gamepad_Button";
+
+procedure_argument_type_exceptions["is_mouse_button_pressed"]["button"] = "Mouse_Button";
+procedure_argument_type_exceptions["is_mouse_button_down"]["button"] = "Mouse_Button";
+procedure_argument_type_exceptions["is_mouse_button_released"]["button"] = "Mouse_Button";
+procedure_argument_type_exceptions["is_mouse_button_up"]["button"] = "Mouse_Button";
+
+
+// NOTE(BigChungusShrek): Not completely sure about these.
+
+procedure_argument_type_exceptions["set_config_flags"]["flags"] = "Config_Flags";
+
+procedure_argument_type_exceptions["trace_log"]["log_level"] = "Trace_Log_Level";
+
+procedure_argument_type_exceptions["set_mouse_cursor"]["cursor"] = "Mouse_Cursor";
+
+procedure_argument_type_exceptions["get_gamepad_axis_movement"]["axis"] = "Gamepad_Axis";
+
+procedure_argument_type_exceptions["set_material_texture"]["map_type"] = "Material_Map_Index";
+
+procedure_argument_type_exceptions["set_shader_value"]["loc_index"] = "Shader_Location_Index";
+procedure_argument_type_exceptions["set_shader_value_v"]["loc_index"] = "Shader_Location_Index";
+procedure_argument_type_exceptions["set_shader_value_matrix"]["loc_index"] = "Shader_Location_Index";
+procedure_argument_type_exceptions["set_shader_value_texture"]["loc_index"] = "Shader_Location_Index";
+
+procedure_argument_type_exceptions["set_shader_value"]["unform_type"] = "Shader_Uniform_Data_Type";
+procedure_argument_type_exceptions["set_shader_value_v"]["unform_type"] = "Shader_Uniform_Data_Type";
+
+// TODO(BigChungusShrek): Which procs use Shader_Attribute_Data_Type???
+
+procedure_argument_type_exceptions["get_pixel_color"]["format"] = "Pixel_Format";
+procedure_argument_type_exceptions["set_pixel_color"]["format"] = "Pixel_Format";
+procedure_argument_type_exceptions["get_pixel_data_size"]["format"] = "Pixel_Format";
+
+procedure_argument_type_exceptions["set_texture_filter"]["filter"] = "Texture_Filter";
+
+procedure_argument_type_exceptions["set_texture_wrap"]["wrap"] = "Texture_Wrap";
+
+procedure_argument_type_exceptions["load_texture_cubemap"]["layout"] = "Cubemap_Layout";
+
+// TODO(BigChungusShrek): Which procs use Font_Type???
+
+procedure_argument_type_exceptions["set_texture_wrap"]["wrap"] = "Texture_Wrap";
+
+procedure_argument_type_exceptions["begin_blend_mode"]["mode"] = "Blend_Mode";
+
+// NOTE(BigChungusShrek): Right here I'm assuming that gesture's type is Gesture and not flags.
+procedure_argument_type_exceptions["is_gesture_detected"]["gesture"] = "Gesture";
+
+procedure_argument_type_exceptions["set_camera_mode"]["mode"] = "Camera_Mode";
+
+// TODO(BigChungusShrek): Which procs use N_Patch_Layout???
+
+
+struct_member_type_exceptions: map[string][string]string;
+
+struct_member_type_exceptions["Image"]["format"] = "Pixel_Format";
+
+struct_member_type_exceptions["Texture"]["format"] = "Pixel_Format";
+
+struct_member_type_exceptions["Camera3d"]["projection"] = "Camera_Projection";
+
+// TODO(BigChungusShrek): What is the type for this? It just says audio filetype. Or is it just i32?
+//struct_member_type_exceptions["Music"]["ctx_type"] = "";
