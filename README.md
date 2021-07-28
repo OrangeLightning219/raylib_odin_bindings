@@ -47,4 +47,5 @@ To run an example copy `raylib.dll` to `examples/out` folder and execute `run_ex
 
 ## TODO
 - [ ] Linux support
+- [ ] Mac support
 - [ ] More examples to make sure all major feautures are working
