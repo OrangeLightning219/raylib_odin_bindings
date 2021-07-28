@@ -20,7 +20,7 @@ main :: proc()
     camera.target = Vector3{0.0, 1.8, 0.0};
     camera.up = Vector3{0.0, 1.0, 0.0};
     camera.fovy = 60.0;
-    camera.projection = i32(Camera_Projection.CAMERA_PERSPECTIVE);
+    camera.projection = .CAMERA_PERSPECTIVE;
     
     // Generates some random columns
     heights: [MAX_COLUMNS]f32;
@@ -34,7 +34,7 @@ main :: proc()
         colors[i] = Color{u8(get_random_value(20, 255)), u8(get_random_value(10, 55)), 30, 255};
     }
     
-    set_camera_mode(camera, i32(Camera_Mode.CAMERA_FIRST_PERSON)); // Set a first person camera mode
+    set_camera_mode(camera, .CAMERA_FIRST_PERSON); // Set a first person camera mode
     
     set_target_fps(60);               // Set our game to run at 60 frames-per-second
     

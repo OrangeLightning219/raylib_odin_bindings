@@ -10,7 +10,7 @@ if not exist %raylib_parser_path%/raylib_parser.exe (
     exit /B 1
 )
 
-odin build generate_raylib_bindings.odin -out="raylib/generate_raylib_bindings.exe"
+odin build . -out="raylib/generate_raylib_bindings.exe"
 
 cd %raylib_parser_path%
 %raylib_parser_path%/raylib_parser.exe --output %binding_dir%/raylib/raylib_parser.json --format JSON

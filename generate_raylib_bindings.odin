@@ -80,7 +80,7 @@ generate_typedefs :: proc(file: os.Handle)
 {
 	typedefs := "Quaternion :: Vector4;\nTexture2d :: Texture;\nTexture_Cubemap :: Texture;\nRender_Texture2d :: Render_Texture;\nCamera :: Camera3d;\n";
 	os.write(file, transmute([]u8)typedefs);
-	callback := "Trace_Log_Callback :: proc(log_level: int, text: cstring, args: ..any);\n";
+	callback := "Trace_Log_Callback :: proc(log_level: Trace_Log_Level, text: cstring, args: ..any);\n";
 	os.write(file, transmute([]u8)callback);
 	callback = "Load_File_Data_Callback :: proc(filename: cstring, bytes_read: ^u8) -> ^u8;\n";
 	os.write(file, transmute([]u8)callback);
@@ -159,10 +159,11 @@ generate_structs :: proc(file: os.Handle, structs_json: json.Array)
 		defer destroy_builder(&struct_builder);
 		
 		struct_name := s.value.(json.Object)["name"].value.(json.String);
+		struct_name = to_ada_case(struct_name);
 		fields := s.value.(json.Object)["fields"].value.(json.Array);
 		
 		write_string_builder(&struct_builder, "\n");
-		write_string_builder(&struct_builder, to_ada_case(struct_name));
+		write_string_builder(&struct_builder, struct_name);
 		write_string_builder(&struct_builder, " :: struct\n");
 		write_string_builder(&struct_builder, "{\n");
 		
@@ -189,8 +190,17 @@ generate_structs :: proc(file: os.Handle, structs_json: json.Array)
 					temp_name = temp_name[:bracket_index];
 				}
 				
+				final_name := to_snake_case(temp_name);
+
+				name_and_type: [2]string = {struct_name, final_name};
+
+				if(struct_member_exceptions[name_and_type] != "") 
+				{
+					final_type = struct_member_exceptions[name_and_type];
+				}
+
 				write_string_builder(&struct_builder, "\t");
-				write_string_builder(&struct_builder, to_snake_case(temp_name));
+				write_string_builder(&struct_builder, final_name);
 				write_string_builder(&struct_builder, ": ");
 				write_string_builder(&struct_builder, final_type);
 				write_string_builder(&struct_builder, ", // ");
@@ -243,7 +253,6 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 	using strings;
 	foreign_block := "\n@(default_calling_convention=\"c\")\nforeign raylib\n{\n";
 	os.write(file, transmute([]u8)foreign_block);
-	
 	for f in functions_json
 	{
 		function_name := f.value.(json.Object)["name"].value.(json.String);
@@ -266,7 +275,8 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 		write_string_builder(&function_builder, "\t@(link_name=\"");
 		write_string_builder(&function_builder, function_name);
 		write_string_builder(&function_builder, "\")\n\t");
-		write_string_builder(&function_builder, to_snake_case(function_name));
+		function_name = to_snake_case(function_name);
+		write_string_builder(&function_builder, function_name);
 		write_string_builder(&function_builder, " :: proc(");
 		
 		has_params := f.value.(json.Object)["params"].value != nil;
@@ -293,6 +303,12 @@ generate_functions :: proc(file: os.Handle, functions_json: json.Array)
 					type = parse_type(type);
 				}
 				
+				name_and_type: [2]string = {function_name, param_name};
+				if(procedure_argument_type_exceptions[name_and_type] != "") 
+				{
+					type = procedure_argument_type_exceptions[name_and_type];
+				}
+
 				write_string_builder(&function_builder, param_name);
 				write_string_builder(&function_builder, ": ");
 				write_string_builder(&function_builder, type);
@@ -338,85 +354,11 @@ main ::proc()
 	
 	header := "package raylib\n\nforeign import raylib \"raylib.lib\"\n\n";
 	os.write(file, transmute([]u8)header);
-	
+
 	generate_typedefs(file);
 	generate_structs(file, structs_json);
 	generate_enums(file, enums_json);
 	generate_functions(file, functions_json);
+
+	fmt.println(procedure_argument_type_exceptions[{"is_key_pressed", "key"}]);
 }
-
-procedure_argument_type_exceptions: map[string][string]string;
-
-procedure_argument_type_exceptions["is_key_pressed"]["key"] = "Keyboard_Key";
-procedure_argument_type_exceptions["is_key_down"]["key"] = "Keyboard_Key";
-procedure_argument_type_exceptions["is_key_released"]["key"] = "Keyboard_Key";
-procedure_argument_type_exceptions["is_key_up"]["key"] = "Keyboard_Key";
-procedure_argument_type_exceptions["set_exit_key"]["key"] = "Keyboard_Key";
-
-procedure_argument_type_exceptions["is_gamepad_button_pressed"]["button"] = "Gamepad_Button";
-procedure_argument_type_exceptions["is_gamepad_button_down"]["button"] = "Gamepad_Button";
-procedure_argument_type_exceptions["is_gamepad_button_released"]["button"] = "Gamepad_Button";
-procedure_argument_type_exceptions["is_gamepad_button_up"]["button"] = "Gamepad_Button";
-
-procedure_argument_type_exceptions["is_mouse_button_pressed"]["button"] = "Mouse_Button";
-procedure_argument_type_exceptions["is_mouse_button_down"]["button"] = "Mouse_Button";
-procedure_argument_type_exceptions["is_mouse_button_released"]["button"] = "Mouse_Button";
-procedure_argument_type_exceptions["is_mouse_button_up"]["button"] = "Mouse_Button";
-
-
-// NOTE(BigChungusShrek): Not completely sure about these.
-
-procedure_argument_type_exceptions["set_config_flags"]["flags"] = "Config_Flags";
-
-procedure_argument_type_exceptions["trace_log"]["log_level"] = "Trace_Log_Level";
-
-procedure_argument_type_exceptions["set_mouse_cursor"]["cursor"] = "Mouse_Cursor";
-
-procedure_argument_type_exceptions["get_gamepad_axis_movement"]["axis"] = "Gamepad_Axis";
-
-procedure_argument_type_exceptions["set_material_texture"]["map_type"] = "Material_Map_Index";
-
-procedure_argument_type_exceptions["set_shader_value"]["loc_index"] = "Shader_Location_Index";
-procedure_argument_type_exceptions["set_shader_value_v"]["loc_index"] = "Shader_Location_Index";
-procedure_argument_type_exceptions["set_shader_value_matrix"]["loc_index"] = "Shader_Location_Index";
-procedure_argument_type_exceptions["set_shader_value_texture"]["loc_index"] = "Shader_Location_Index";
-
-procedure_argument_type_exceptions["set_shader_value"]["unform_type"] = "Shader_Uniform_Data_Type";
-procedure_argument_type_exceptions["set_shader_value_v"]["unform_type"] = "Shader_Uniform_Data_Type";
-
-// TODO(BigChungusShrek): Which procs use Shader_Attribute_Data_Type???
-
-procedure_argument_type_exceptions["get_pixel_color"]["format"] = "Pixel_Format";
-procedure_argument_type_exceptions["set_pixel_color"]["format"] = "Pixel_Format";
-procedure_argument_type_exceptions["get_pixel_data_size"]["format"] = "Pixel_Format";
-
-procedure_argument_type_exceptions["set_texture_filter"]["filter"] = "Texture_Filter";
-
-procedure_argument_type_exceptions["set_texture_wrap"]["wrap"] = "Texture_Wrap";
-
-procedure_argument_type_exceptions["load_texture_cubemap"]["layout"] = "Cubemap_Layout";
-
-// TODO(BigChungusShrek): Which procs use Font_Type???
-
-procedure_argument_type_exceptions["set_texture_wrap"]["wrap"] = "Texture_Wrap";
-
-procedure_argument_type_exceptions["begin_blend_mode"]["mode"] = "Blend_Mode";
-
-// NOTE(BigChungusShrek): Right here I'm assuming that gesture's type is Gesture and not flags.
-procedure_argument_type_exceptions["is_gesture_detected"]["gesture"] = "Gesture";
-
-procedure_argument_type_exceptions["set_camera_mode"]["mode"] = "Camera_Mode";
-
-// TODO(BigChungusShrek): Which procs use N_Patch_Layout???
-
-
-struct_member_type_exceptions: map[string][string]string;
-
-struct_member_type_exceptions["Image"]["format"] = "Pixel_Format";
-
-struct_member_type_exceptions["Texture"]["format"] = "Pixel_Format";
-
-struct_member_type_exceptions["Camera3d"]["projection"] = "Camera_Projection";
-
-// TODO(BigChungusShrek): What is the type for this? It just says audio filetype. Or is it just i32?
-//struct_member_type_exceptions["Music"]["ctx_type"] = "";

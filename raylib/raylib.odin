@@ -91,7 +91,7 @@ Color :: struct
 
 Rectangle :: struct
 {
-	x: f32, // Rectangle top-left corner position x 
+	x: f32, // Rectangle top-left corner position x
 	y: f32, // Rectangle top-left corner position y
 	width: f32, // Rectangle width
 	height: f32, // Rectangle height
@@ -103,7 +103,7 @@ Image :: struct
 	width: i32, // Image base width
 	height: i32, // Image base height
 	mipmaps: i32, // Mipmap levels, 1 by default
-	format: i32, // Data format (PixelFormat type)
+	format: Pixel_Format, // Data format (PixelFormat type)
 };
 
 Texture :: struct
@@ -112,7 +112,7 @@ Texture :: struct
 	width: i32, // Texture base width
 	height: i32, // Texture base height
 	mipmaps: i32, // Mipmap levels, 1 by default
-	format: i32, // Data format (PixelFormat type)
+	format: Pixel_Format, // Data format (PixelFormat type)
 };
 
 Render_Texture :: struct
@@ -157,7 +157,7 @@ Camera3d :: struct
 	target: Vector3, // Camera target it looks-at
 	up: Vector3, // Camera up vector (rotation over its axis)
 	fovy: f32, // Camera field-of-view apperture in Y (degrees) in perspective, used as near plane width in orthographic
-	projection: i32, // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
+	projection: Camera_Projection, // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
 };
 
 Camera2d :: struct
@@ -395,6 +395,10 @@ Keyboard_Key :: enum
 	KEY_X = 88,
 	KEY_Y = 89,
 	KEY_Z = 90,
+	KEY_LEFT_BRACKET = 91,
+	KEY_BACKSLASH = 92,
+	KEY_RIGHT_BRACKET = 93,
+	KEY_GRAVE = 96,
 	KEY_SPACE = 32,
 	KEY_ESCAPE = 256,
 	KEY_ENTER = 257,
@@ -436,10 +440,6 @@ Keyboard_Key :: enum
 	KEY_RIGHT_ALT = 346,
 	KEY_RIGHT_SUPER = 347,
 	KEY_KB_MENU = 348,
-	KEY_LEFT_BRACKET = 91,
-	KEY_BACKSLASH = 92,
-	KEY_RIGHT_BRACKET = 93,
-	KEY_GRAVE = 96,
 	KEY_KP_0 = 320,
 	KEY_KP_1 = 321,
 	KEY_KP_2 = 322,
@@ -854,6 +854,18 @@ foreign raylib
 	@(link_name="GetClipboardText")
 	get_clipboard_text :: proc() -> cstring ---;
 
+	// Swap back buffer with front buffer (screen drawing)
+	@(link_name="SwapScreenBuffer")
+	swap_screen_buffer :: proc() ---;
+
+	// Register all input events
+	@(link_name="PollInputEvents")
+	poll_input_events :: proc() ---;
+
+	// Wait for some milliseconds (halt program execution)
+	@(link_name="WaitTime")
+	wait_time :: proc(ms: f32) ---;
+
 	// Hides cursor
 	@(link_name="HideCursor")
 	hide_cursor :: proc() ---;
@@ -920,7 +932,7 @@ foreign raylib
 
 	// Begin blending mode (alpha, additive, multiplied, subtract, custom)
 	@(link_name="BeginBlendMode")
-	begin_blend_mode :: proc(mode: i32) ---;
+	begin_blend_mode :: proc(mode: Blend_Mode) ---;
 
 	// End blending mode (reset to default: alpha blending)
 	@(link_name="EndBlendMode")
@@ -968,19 +980,19 @@ foreign raylib
 
 	// Set shader uniform value
 	@(link_name="SetShaderValue")
-	set_shader_value :: proc(shader: Shader, loc_index: i32, value: rawptr, uniform_type: i32) ---;
+	set_shader_value :: proc(shader: Shader, loc_index: Shader_Location_Index, value: rawptr, uniform_type: Shader_Uniform_Data_Type) ---;
 
 	// Set shader uniform value vector
 	@(link_name="SetShaderValueV")
-	set_shader_value_v :: proc(shader: Shader, loc_index: i32, value: rawptr, uniform_type: i32, count: i32) ---;
+	set_shader_value_v :: proc(shader: Shader, loc_index: Shader_Location_Index, value: rawptr, uniform_type: Shader_Uniform_Data_Type, count: i32) ---;
 
 	// Set shader uniform value (matrix 4x4)
 	@(link_name="SetShaderValueMatrix")
-	set_shader_value_matrix :: proc(shader: Shader, loc_index: i32, mat: Matrix) ---;
+	set_shader_value_matrix :: proc(shader: Shader, loc_index: Shader_Location_Index, mat: Matrix) ---;
 
 	// Set shader uniform value for texture (sampler2d)
 	@(link_name="SetShaderValueTexture")
-	set_shader_value_texture :: proc(shader: Shader, loc_index: i32, texture: Texture2d) ---;
+	set_shader_value_texture :: proc(shader: Shader, loc_index: Shader_Location_Index, texture: Texture2d) ---;
 
 	// Unload shader from GPU memory (VRAM)
 	@(link_name="UnloadShader")
@@ -1040,11 +1052,11 @@ foreign raylib
 
 	// Setup init configuration flags (view FLAGS)
 	@(link_name="SetConfigFlags")
-	set_config_flags :: proc(flags: u32) ---;
+	set_config_flags :: proc(flags: Config_Flags) ---;
 
 	// Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 	@(link_name="TraceLog")
-	trace_log :: proc(log_level: i32, text: cstring, #c_vararg args: ..any) ---;
+	trace_log :: proc(log_level: Trace_Log_Level, text: cstring, #c_vararg args: ..any) ---;
 
 	// Set the current threshold (minimum) log level
 	@(link_name="SetTraceLogLevel")
@@ -1192,23 +1204,23 @@ foreign raylib
 
 	// Check if a key has been pressed once
 	@(link_name="IsKeyPressed")
-	is_key_pressed :: proc(key: i32) -> bool ---;
+	is_key_pressed :: proc(key: Keyboard_Key) -> bool ---;
 
 	// Check if a key is being pressed
 	@(link_name="IsKeyDown")
-	is_key_down :: proc(key: i32) -> bool ---;
+	is_key_down :: proc(key: Keyboard_Key) -> bool ---;
 
 	// Check if a key has been released once
 	@(link_name="IsKeyReleased")
-	is_key_released :: proc(key: i32) -> bool ---;
+	is_key_released :: proc(key: Keyboard_Key) -> bool ---;
 
 	// Check if a key is NOT being pressed
 	@(link_name="IsKeyUp")
-	is_key_up :: proc(key: i32) -> bool ---;
+	is_key_up :: proc(key: Keyboard_Key) -> bool ---;
 
 	// Set a custom key to exit program (default is ESC)
 	@(link_name="SetExitKey")
-	set_exit_key :: proc(key: i32) ---;
+	set_exit_key :: proc(key: Keyboard_Key) ---;
 
 	// Get key pressed (keycode), call it multiple times for keys queued
 	@(link_name="GetKeyPressed")
@@ -1232,19 +1244,19 @@ foreign raylib
 
 	// Check if a gamepad button has been pressed once
 	@(link_name="IsGamepadButtonPressed")
-	is_gamepad_button_pressed :: proc(gamepad: i32, button: i32) -> bool ---;
+	is_gamepad_button_pressed :: proc(gamepad: i32, button: Gamepad_Button) -> bool ---;
 
 	// Check if a gamepad button is being pressed
 	@(link_name="IsGamepadButtonDown")
-	is_gamepad_button_down :: proc(gamepad: i32, button: i32) -> bool ---;
+	is_gamepad_button_down :: proc(gamepad: i32, button: Gamepad_Button) -> bool ---;
 
 	// Check if a gamepad button has been released once
 	@(link_name="IsGamepadButtonReleased")
-	is_gamepad_button_released :: proc(gamepad: i32, button: i32) -> bool ---;
+	is_gamepad_button_released :: proc(gamepad: i32, button: Gamepad_Button) -> bool ---;
 
 	// Check if a gamepad button is NOT being pressed
 	@(link_name="IsGamepadButtonUp")
-	is_gamepad_button_up :: proc(gamepad: i32, button: i32) -> bool ---;
+	is_gamepad_button_up :: proc(gamepad: i32, button: Gamepad_Button) -> bool ---;
 
 	// Get the last gamepad button pressed
 	@(link_name="GetGamepadButtonPressed")
@@ -1256,7 +1268,7 @@ foreign raylib
 
 	// Get axis movement value for a gamepad axis
 	@(link_name="GetGamepadAxisMovement")
-	get_gamepad_axis_movement :: proc(gamepad: i32, axis: i32) -> f32 ---;
+	get_gamepad_axis_movement :: proc(gamepad: i32, axis: Gamepad_Axis) -> f32 ---;
 
 	// Set internal gamepad mappings (SDL_GameControllerDB)
 	@(link_name="SetGamepadMappings")
@@ -1264,19 +1276,19 @@ foreign raylib
 
 	// Check if a mouse button has been pressed once
 	@(link_name="IsMouseButtonPressed")
-	is_mouse_button_pressed :: proc(button: i32) -> bool ---;
+	is_mouse_button_pressed :: proc(button: Mouse_Button) -> bool ---;
 
 	// Check if a mouse button is being pressed
 	@(link_name="IsMouseButtonDown")
-	is_mouse_button_down :: proc(button: i32) -> bool ---;
+	is_mouse_button_down :: proc(button: Mouse_Button) -> bool ---;
 
 	// Check if a mouse button has been released once
 	@(link_name="IsMouseButtonReleased")
-	is_mouse_button_released :: proc(button: i32) -> bool ---;
+	is_mouse_button_released :: proc(button: Mouse_Button) -> bool ---;
 
 	// Check if a mouse button is NOT being pressed
 	@(link_name="IsMouseButtonUp")
-	is_mouse_button_up :: proc(button: i32) -> bool ---;
+	is_mouse_button_up :: proc(button: Mouse_Button) -> bool ---;
 
 	// Get mouse position X
 	@(link_name="GetMouseX")
@@ -1289,6 +1301,10 @@ foreign raylib
 	// Get mouse position XY
 	@(link_name="GetMousePosition")
 	get_mouse_position :: proc() -> Vector2 ---;
+
+	// Get mouse delta between frames
+	@(link_name="GetMouseDelta")
+	get_mouse_delta :: proc() -> Vector2 ---;
 
 	// Set mouse position XY
 	@(link_name="SetMousePosition")
@@ -1308,7 +1324,7 @@ foreign raylib
 
 	// Set mouse cursor
 	@(link_name="SetMouseCursor")
-	set_mouse_cursor :: proc(cursor: i32) ---;
+	set_mouse_cursor :: proc(cursor: Mouse_Cursor) ---;
 
 	// Get touch position X for touch point 0 (relative to screen size)
 	@(link_name="GetTouchX")
@@ -1328,7 +1344,7 @@ foreign raylib
 
 	// Check if a gesture have been detected
 	@(link_name="IsGestureDetected")
-	is_gesture_detected :: proc(gesture: i32) -> bool ---;
+	is_gesture_detected :: proc(gesture: Gesture) -> bool ---;
 
 	// Get latest detected gesture
 	@(link_name="GetGestureDetected")
@@ -1360,7 +1376,7 @@ foreign raylib
 
 	// Set camera mode (multiple camera modes available)
 	@(link_name="SetCameraMode")
-	set_camera_mode :: proc(camera: Camera, mode: i32) ---;
+	set_camera_mode :: proc(camera: Camera, mode: Camera_Mode) ---;
 
 	// Update camera position for selected mode
 	@(link_name="UpdateCamera")
@@ -1577,6 +1593,14 @@ foreign raylib
 	// Load image from memory buffer, fileType refers to extension: i.e. '.png'
 	@(link_name="LoadImageFromMemory")
 	load_image_from_memory :: proc(file_type: cstring, file_data: ^u8, data_size: i32) -> Image ---;
+
+	// Load image from GPU texture data
+	@(link_name="LoadImageFromTexture")
+	load_image_from_texture :: proc(texture: Texture2d) -> Image ---;
+
+	// Load image from screen buffer and (screenshot)
+	@(link_name="LoadImageFromScreen")
+	load_image_from_screen :: proc() -> Image ---;
 
 	// Unload image from CPU memory (RAM)
 	@(link_name="UnloadImage")
@@ -1812,7 +1836,7 @@ foreign raylib
 
 	// Load cubemap from image, multiple image cubemap layouts supported
 	@(link_name="LoadTextureCubemap")
-	load_texture_cubemap :: proc(image: Image, layout: i32) -> Texture_Cubemap ---;
+	load_texture_cubemap :: proc(image: Image, layout: Cubemap_Layout) -> Texture_Cubemap ---;
 
 	// Load texture for rendering (framebuffer)
 	@(link_name="LoadRenderTexture")
@@ -1834,25 +1858,17 @@ foreign raylib
 	@(link_name="UpdateTextureRec")
 	update_texture_rec :: proc(texture: Texture2d, rec: Rectangle, pixels: rawptr) ---;
 
-	// Get pixel data from GPU texture and return an Image
-	@(link_name="GetTextureData")
-	get_texture_data :: proc(texture: Texture2d) -> Image ---;
-
-	// Get pixel data from screen buffer and return an Image (screenshot)
-	@(link_name="GetScreenData")
-	get_screen_data :: proc() -> Image ---;
-
 	// Generate GPU mipmaps for a texture
 	@(link_name="GenTextureMipmaps")
 	gen_texture_mipmaps :: proc(texture: ^Texture2d) ---;
 
 	// Set texture scaling filter mode
 	@(link_name="SetTextureFilter")
-	set_texture_filter :: proc(texture: Texture2d, filter: i32) ---;
+	set_texture_filter :: proc(texture: Texture2d, filter: Texture_Filter) ---;
 
 	// Set texture wrapping mode
 	@(link_name="SetTextureWrap")
-	set_texture_wrap :: proc(texture: Texture2d, wrap: i32) ---;
+	set_texture_wrap :: proc(texture: Texture2d, wrap: Texture_Wrap) ---;
 
 	// Draw a Texture2D
 	@(link_name="DrawTexture")
@@ -1928,15 +1944,15 @@ foreign raylib
 
 	// Get Color from a source pixel pointer of certain format
 	@(link_name="GetPixelColor")
-	get_pixel_color :: proc(src_ptr: rawptr, format: i32) -> Color ---;
+	get_pixel_color :: proc(src_ptr: rawptr, format: Pixel_Format) -> Color ---;
 
 	// Set color formatted into destination pixel pointer
 	@(link_name="SetPixelColor")
-	set_pixel_color :: proc(dst_ptr: rawptr, color: Color, format: i32) ---;
+	set_pixel_color :: proc(dst_ptr: rawptr, color: Color, format: Pixel_Format) ---;
 
 	// Get pixel data size in bytes for certain format
 	@(link_name="GetPixelDataSize")
-	get_pixel_data_size :: proc(width: i32, height: i32, format: i32) -> i32 ---;
+	get_pixel_data_size :: proc(width: i32, height: i32, format: Pixel_Format) -> i32 ---;
 
 	// Get the default Font
 	@(link_name="GetFontDefault")
@@ -2074,17 +2090,21 @@ foreign raylib
 	@(link_name="TextToUtf8")
 	text_to_utf8 :: proc(codepoints: ^i32, length: i32) -> ^u8 ---;
 
-	// Get all codepoints in a string, codepoints count returned by parameters
-	@(link_name="GetCodepoints")
-	get_codepoints :: proc(text: cstring, count: ^i32) -> ^i32 ---;
+	// Load all codepoints from a UTF8 text string, codepoints count returned by parameter
+	@(link_name="LoadCodepoints")
+	load_codepoints :: proc(text: cstring, count: ^i32) -> ^i32 ---;
+
+	// Unload codepoints data from memory
+	@(link_name="UnloadCodepoints")
+	unload_codepoints :: proc(codepoints: ^i32) ---;
 
 	// Get total number of characters (codepoints) in a UTF8 encoded string
 	@(link_name="GetCodepointsCount")
 	get_codepoints_count :: proc(text: cstring) -> i32 ---;
 
-	// Get next codepoint in a UTF8 encoded string; 0x3f('?') is returned on failure
-	@(link_name="GetNextCodepoint")
-	get_next_codepoint :: proc(text: cstring, bytes_processed: ^i32) -> i32 ---;
+	// Get next codepoint in a UTF8 encoded string, 0x3f('?') is returned on failure
+	@(link_name="GetCodepoint")
+	get_codepoint :: proc(text: cstring, bytes_processed: ^i32) -> i32 ---;
 
 	// Encode codepoint into utf8 text (char array length returned as parameter)
 	@(link_name="CodepointToUtf8")
@@ -2178,6 +2198,42 @@ foreign raylib
 	@(link_name="UnloadModelKeepMeshes")
 	unload_model_keep_meshes :: proc(model: Model) ---;
 
+	// Compute model bounding box limits (considers all meshes)
+	@(link_name="GetModelBoundingBox")
+	get_model_bounding_box :: proc(model: Model) -> Bounding_Box ---;
+
+	// Draw a model (with texture if set)
+	@(link_name="DrawModel")
+	draw_model :: proc(model: Model, position: Vector3, scale: f32, tint: Color) ---;
+
+	// Draw a model with extended parameters
+	@(link_name="DrawModelEx")
+	draw_model_ex :: proc(model: Model, position: Vector3, rotation_axis: Vector3, rotation_angle: f32, scale: Vector3, tint: Color) ---;
+
+	// Draw a model wires (with texture if set)
+	@(link_name="DrawModelWires")
+	draw_model_wires :: proc(model: Model, position: Vector3, scale: f32, tint: Color) ---;
+
+	// Draw a model wires (with texture if set) with extended parameters
+	@(link_name="DrawModelWiresEx")
+	draw_model_wires_ex :: proc(model: Model, position: Vector3, rotation_axis: Vector3, rotation_angle: f32, scale: Vector3, tint: Color) ---;
+
+	// Draw bounding box (wires)
+	@(link_name="DrawBoundingBox")
+	draw_bounding_box :: proc(box: Bounding_Box, color: Color) ---;
+
+	// Draw a billboard texture
+	@(link_name="DrawBillboard")
+	draw_billboard :: proc(camera: Camera, texture: Texture2d, position: Vector3, size: f32, tint: Color) ---;
+
+	// Draw a billboard texture defined by source
+	@(link_name="DrawBillboardRec")
+	draw_billboard_rec :: proc(camera: Camera, texture: Texture2d, source: Rectangle, position: Vector3, size: Vector2, tint: Color) ---;
+
+	// Draw a billboard texture defined by source and rotation
+	@(link_name="DrawBillboardPro")
+	draw_billboard_pro :: proc(camera: Camera, texture: Texture2d, source: Rectangle, position: Vector3, size: Vector2, origin: Vector2, rotation: f32, tint: Color) ---;
+
 	// Upload mesh vertex data in GPU and provide VAO/VBO ids
 	@(link_name="UploadMesh")
 	upload_mesh :: proc(mesh: ^Mesh, _dynamic: bool) ---;
@@ -2185,6 +2241,10 @@ foreign raylib
 	// Update mesh vertex data in GPU for a specific buffer index
 	@(link_name="UpdateMeshBuffer")
 	update_mesh_buffer :: proc(mesh: Mesh, index: i32, data: rawptr, data_size: i32, offset: i32) ---;
+
+	// Unload mesh data from CPU and GPU
+	@(link_name="UnloadMesh")
+	unload_mesh :: proc(mesh: Mesh) ---;
 
 	// Draw a 3d mesh with material and transform
 	@(link_name="DrawMesh")
@@ -2194,53 +2254,21 @@ foreign raylib
 	@(link_name="DrawMeshInstanced")
 	draw_mesh_instanced :: proc(mesh: Mesh, material: Material, transforms: ^Matrix, instances: i32) ---;
 
-	// Unload mesh data from CPU and GPU
-	@(link_name="UnloadMesh")
-	unload_mesh :: proc(mesh: Mesh) ---;
-
 	// Export mesh data to file, returns true on success
 	@(link_name="ExportMesh")
 	export_mesh :: proc(mesh: Mesh, file_name: cstring) -> bool ---;
 
-	// Load materials from model file
-	@(link_name="LoadMaterials")
-	load_materials :: proc(file_name: cstring, material_count: ^i32) -> ^Material ---;
+	// Compute mesh bounding box limits
+	@(link_name="GetMeshBoundingBox")
+	get_mesh_bounding_box :: proc(mesh: Mesh) -> Bounding_Box ---;
 
-	// Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
-	@(link_name="LoadMaterialDefault")
-	load_material_default :: proc() -> Material ---;
+	// Compute mesh tangents
+	@(link_name="GenMeshTangents")
+	gen_mesh_tangents :: proc(mesh: ^Mesh) ---;
 
-	// Unload material from GPU memory (VRAM)
-	@(link_name="UnloadMaterial")
-	unload_material :: proc(material: Material) ---;
-
-	// Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
-	@(link_name="SetMaterialTexture")
-	set_material_texture :: proc(material: ^Material, map_type: i32, texture: Texture2d) ---;
-
-	// Set material for a mesh
-	@(link_name="SetModelMeshMaterial")
-	set_model_mesh_material :: proc(model: ^Model, mesh_id: i32, material_id: i32) ---;
-
-	// Load model animations from file
-	@(link_name="LoadModelAnimations")
-	load_model_animations :: proc(file_name: cstring, anims_count: ^i32) -> ^Model_Animation ---;
-
-	// Update model animation pose
-	@(link_name="UpdateModelAnimation")
-	update_model_animation :: proc(model: Model, anim: Model_Animation, frame: i32) ---;
-
-	// Unload animation data
-	@(link_name="UnloadModelAnimation")
-	unload_model_animation :: proc(anim: Model_Animation) ---;
-
-	// Unload animation array data
-	@(link_name="UnloadModelAnimations")
-	unload_model_animations :: proc(animations: ^Model_Animation, count: u32) ---;
-
-	// Check model animation skeleton match
-	@(link_name="IsModelAnimationValid")
-	is_model_animation_valid :: proc(model: Model, anim: Model_Animation) -> bool ---;
+	// Compute mesh binormals
+	@(link_name="GenMeshBinormals")
+	gen_mesh_binormals :: proc(mesh: ^Mesh) ---;
 
 	// Generate polygonal mesh
 	@(link_name="GenMeshPoly")
@@ -2282,49 +2310,45 @@ foreign raylib
 	@(link_name="GenMeshCubicmap")
 	gen_mesh_cubicmap :: proc(cubicmap: Image, cube_size: Vector3) -> Mesh ---;
 
-	// Compute mesh bounding box limits
-	@(link_name="GetMeshBoundingBox")
-	get_mesh_bounding_box :: proc(mesh: Mesh) -> Bounding_Box ---;
+	// Load materials from model file
+	@(link_name="LoadMaterials")
+	load_materials :: proc(file_name: cstring, material_count: ^i32) -> ^Material ---;
 
-	// Compute mesh tangents
-	@(link_name="MeshTangents")
-	mesh_tangents :: proc(mesh: ^Mesh) ---;
+	// Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
+	@(link_name="LoadMaterialDefault")
+	load_material_default :: proc() -> Material ---;
 
-	// Compute mesh binormals
-	@(link_name="MeshBinormals")
-	mesh_binormals :: proc(mesh: ^Mesh) ---;
+	// Unload material from GPU memory (VRAM)
+	@(link_name="UnloadMaterial")
+	unload_material :: proc(material: Material) ---;
 
-	// Draw a model (with texture if set)
-	@(link_name="DrawModel")
-	draw_model :: proc(model: Model, position: Vector3, scale: f32, tint: Color) ---;
+	// Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
+	@(link_name="SetMaterialTexture")
+	set_material_texture :: proc(material: ^Material, map_type: Material_Map_Index, texture: Texture2d) ---;
 
-	// Draw a model with extended parameters
-	@(link_name="DrawModelEx")
-	draw_model_ex :: proc(model: Model, position: Vector3, rotation_axis: Vector3, rotation_angle: f32, scale: Vector3, tint: Color) ---;
+	// Set material for a mesh
+	@(link_name="SetModelMeshMaterial")
+	set_model_mesh_material :: proc(model: ^Model, mesh_id: i32, material_id: i32) ---;
 
-	// Draw a model wires (with texture if set)
-	@(link_name="DrawModelWires")
-	draw_model_wires :: proc(model: Model, position: Vector3, scale: f32, tint: Color) ---;
+	// Load model animations from file
+	@(link_name="LoadModelAnimations")
+	load_model_animations :: proc(file_name: cstring, anims_count: ^i32) -> ^Model_Animation ---;
 
-	// Draw a model wires (with texture if set) with extended parameters
-	@(link_name="DrawModelWiresEx")
-	draw_model_wires_ex :: proc(model: Model, position: Vector3, rotation_axis: Vector3, rotation_angle: f32, scale: Vector3, tint: Color) ---;
+	// Update model animation pose
+	@(link_name="UpdateModelAnimation")
+	update_model_animation :: proc(model: Model, anim: Model_Animation, frame: i32) ---;
 
-	// Draw bounding box (wires)
-	@(link_name="DrawBoundingBox")
-	draw_bounding_box :: proc(box: Bounding_Box, color: Color) ---;
+	// Unload animation data
+	@(link_name="UnloadModelAnimation")
+	unload_model_animation :: proc(anim: Model_Animation) ---;
 
-	// Draw a billboard texture
-	@(link_name="DrawBillboard")
-	draw_billboard :: proc(camera: Camera, texture: Texture2d, position: Vector3, size: f32, tint: Color) ---;
+	// Unload animation array data
+	@(link_name="UnloadModelAnimations")
+	unload_model_animations :: proc(animations: ^Model_Animation, count: u32) ---;
 
-	// Draw a billboard texture defined by source
-	@(link_name="DrawBillboardRec")
-	draw_billboard_rec :: proc(camera: Camera, texture: Texture2d, source: Rectangle, position: Vector3, size: Vector2, tint: Color) ---;
-
-	// Draw a billboard texture defined by source and rotation
-	@(link_name="DrawBillboardPro")
-	draw_billboard_pro :: proc(camera: Camera, texture: Texture2d, source: Rectangle, position: Vector3, size: Vector2, origin: Vector2, rotation: f32, tint: Color) ---;
+	// Check model animation skeleton match
+	@(link_name="IsModelAnimationValid")
+	is_model_animation_valid :: proc(model: Model, anim: Model_Animation) -> bool ---;
 
 	// Check collision between two spheres
 	@(link_name="CheckCollisionSpheres")

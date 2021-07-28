@@ -42,7 +42,7 @@ main :: proc()
     {
         // Update
         //----------------------------------------------------------------------------------
-        if is_mouse_button_down(cast(i32)Mouse_Button.MOUSE_BUTTON_LEFT)
+        if is_mouse_button_down(.MOUSE_BUTTON_LEFT)
         {
             // Create more bunnies
             for i in 0..<100

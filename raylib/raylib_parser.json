@@ -122,7 +122,7 @@
         {
           "name": "x",
           "type": "float",
-          "description": "Rectangle top-left corner position x "
+          "description": "Rectangle top-left corner position x"
         },
         {
           "name": "y",
@@ -1250,6 +1250,26 @@
           "description": ""
         },
         {
+          "name": "KEY_LEFT_BRACKET",
+          "value": 91,
+          "description": ""
+        },
+        {
+          "name": "KEY_BACKSLASH",
+          "value": 92,
+          "description": ""
+        },
+        {
+          "name": "KEY_RIGHT_BRACKET",
+          "value": 93,
+          "description": ""
+        },
+        {
+          "name": "KEY_GRAVE",
+          "value": 96,
+          "description": ""
+        },
+        {
           "name": "KEY_SPACE",
           "value": 32,
           "description": ""
@@ -1452,26 +1472,6 @@
         {
           "name": "KEY_KB_MENU",
           "value": 348,
-          "description": ""
-        },
-        {
-          "name": "KEY_LEFT_BRACKET",
-          "value": 91,
-          "description": ""
-        },
-        {
-          "name": "KEY_BACKSLASH",
-          "value": 92,
-          "description": ""
-        },
-        {
-          "name": "KEY_RIGHT_BRACKET",
-          "value": 93,
-          "description": ""
-        },
-        {
-          "name": "KEY_GRAVE",
-          "value": 96,
           "description": ""
         },
         {
@@ -2741,6 +2741,24 @@
       "returnType": "const char *"
     },
     {
+      "name": "SwapScreenBuffer",
+      "description": "Swap back buffer with front buffer (screen drawing)",
+      "returnType": "void"
+    },
+    {
+      "name": "PollInputEvents",
+      "description": "Register all input events",
+      "returnType": "void"
+    },
+    {
+      "name": "WaitTime",
+      "description": "Wait for some milliseconds (halt program execution)",
+      "returnType": "void",
+      "params": {
+        "ms": "float"
+      }
+    },
+    {
       "name": "ShowCursor",
       "description": "Shows cursor",
       "returnType": "void"
@@ -3583,6 +3601,11 @@
       "returnType": "Vector2"
     },
     {
+      "name": "GetMouseDelta",
+      "description": "Get mouse delta between frames",
+      "returnType": "Vector2"
+    },
+    {
       "name": "SetMousePosition",
       "description": "Set mouse position XY",
       "returnType": "void",
@@ -4286,6 +4309,19 @@
       }
     },
     {
+      "name": "LoadImageFromTexture",
+      "description": "Load image from GPU texture data",
+      "returnType": "Image",
+      "params": {
+        "texture": "Texture2D"
+      }
+    },
+    {
+      "name": "LoadImageFromScreen",
+      "description": "Load image from screen buffer and (screenshot)",
+      "returnType": "Image"
+    },
+    {
       "name": "UnloadImage",
       "description": "Unload image from CPU memory (RAM)",
       "returnType": "void",
@@ -4914,19 +4950,6 @@
       }
     },
     {
-      "name": "GetTextureData",
-      "description": "Get pixel data from GPU texture and return an Image",
-      "returnType": "Image",
-      "params": {
-        "texture": "Texture2D"
-      }
-    },
-    {
-      "name": "GetScreenData",
-      "description": "Get pixel data from screen buffer and return an Image (screenshot)",
-      "returnType": "Image"
-    },
-    {
       "name": "GenTextureMipmaps",
       "description": "Generate GPU mipmaps for a texture",
       "returnType": "void",
@@ -5511,12 +5534,20 @@
       }
     },
     {
-      "name": "GetCodepoints",
-      "description": "Get all codepoints in a string, codepoints count returned by parameters",
+      "name": "LoadCodepoints",
+      "description": "Load all codepoints from a UTF8 text string, codepoints count returned by parameter",
       "returnType": "int *",
       "params": {
         "text": "const char *",
         "count": "int *"
+      }
+    },
+    {
+      "name": "UnloadCodepoints",
+      "description": "Unload codepoints data from memory",
+      "returnType": "void",
+      "params": {
+        "codepoints": "int *"
       }
     },
     {
@@ -5528,8 +5559,8 @@
       }
     },
     {
-      "name": "GetNextCodepoint",
-      "description": "Get next codepoint in a UTF8 encoded string; 0x3f('?') is returned on failure",
+      "name": "GetCodepoint",
+      "description": "Get next codepoint in a UTF8 encoded string, 0x3f('?') is returned on failure",
       "returnType": "int",
       "params": {
         "text": "const char *",
@@ -5775,6 +5806,111 @@
       }
     },
     {
+      "name": "GetModelBoundingBox",
+      "description": "Compute model bounding box limits (considers all meshes)",
+      "returnType": "BoundingBox",
+      "params": {
+        "model": "Model"
+      }
+    },
+    {
+      "name": "DrawModel",
+      "description": "Draw a model (with texture if set)",
+      "returnType": "void",
+      "params": {
+        "model": "Model",
+        "position": "Vector3",
+        "scale": "float",
+        "tint": "Color"
+      }
+    },
+    {
+      "name": "DrawModelEx",
+      "description": "Draw a model with extended parameters",
+      "returnType": "void",
+      "params": {
+        "model": "Model",
+        "position": "Vector3",
+        "rotationAxis": "Vector3",
+        "rotationAngle": "float",
+        "scale": "Vector3",
+        "tint": "Color"
+      }
+    },
+    {
+      "name": "DrawModelWires",
+      "description": "Draw a model wires (with texture if set)",
+      "returnType": "void",
+      "params": {
+        "model": "Model",
+        "position": "Vector3",
+        "scale": "float",
+        "tint": "Color"
+      }
+    },
+    {
+      "name": "DrawModelWiresEx",
+      "description": "Draw a model wires (with texture if set) with extended parameters",
+      "returnType": "void",
+      "params": {
+        "model": "Model",
+        "position": "Vector3",
+        "rotationAxis": "Vector3",
+        "rotationAngle": "float",
+        "scale": "Vector3",
+        "tint": "Color"
+      }
+    },
+    {
+      "name": "DrawBoundingBox",
+      "description": "Draw bounding box (wires)",
+      "returnType": "void",
+      "params": {
+        "box": "BoundingBox",
+        "color": "Color"
+      }
+    },
+    {
+      "name": "DrawBillboard",
+      "description": "Draw a billboard texture",
+      "returnType": "void",
+      "params": {
+        "camera": "Camera",
+        "texture": "Texture2D",
+        "position": "Vector3",
+        "size": "float",
+        "tint": "Color"
+      }
+    },
+    {
+      "name": "DrawBillboardRec",
+      "description": "Draw a billboard texture defined by source",
+      "returnType": "void",
+      "params": {
+        "camera": "Camera",
+        "texture": "Texture2D",
+        "source": "Rectangle",
+        "position": "Vector3",
+        "size": "Vector2",
+        "tint": "Color"
+      }
+    },
+    {
+      "name": "DrawBillboardPro",
+      "description": "Draw a billboard texture defined by source and rotation",
+      "returnType": "void",
+      "params": {
+        "camera": "Camera",
+        "texture": "Texture2D",
+        "source": "Rectangle",
+        "position": "Vector3",
+        "size": "Vector2",
+        "origin": "Vector2",
+        "rotation": "float",
+        "tint": "Color"
+      }
+    },
+    {
       "name": "UploadMesh",
       "description": "Upload mesh vertex data in GPU and provide VAO/VBO ids",
       "returnType": "void",
@@ -5793,6 +5929,14 @@
         "data": "void *",
         "dataSize": "int",
         "offset": "int"
+      }
+    },
+    {
+      "name": "UnloadMesh",
+      "description": "Unload mesh data from CPU and GPU",
+      "returnType": "void",
+      "params": {
+        "mesh": "Mesh"
       }
     },
     {
@@ -5817,14 +5961,6 @@
       }
     },
     {
-      "name": "UnloadMesh",
-      "description": "Unload mesh data from CPU and GPU",
-      "returnType": "void",
-      "params": {
-        "mesh": "Mesh"
-      }
-    },
-    {
       "name": "ExportMesh",
       "description": "Export mesh data to file, returns true on success",
       "returnType": "bool",
@@ -5834,90 +5970,27 @@
       }
     },
     {
-      "name": "LoadMaterials",
-      "description": "Load materials from model file",
-      "returnType": "Material *",
+      "name": "GetMeshBoundingBox",
+      "description": "Compute mesh bounding box limits",
+      "returnType": "BoundingBox",
       "params": {
-        "fileName": "const char *",
-        "materialCount": "int *"
+        "mesh": "Mesh"
       }
     },
     {
-      "name": "LoadMaterialDefault",
-      "description": "Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)",
-      "returnType": "Material"
-    },
-    {
-      "name": "UnloadMaterial",
-      "description": "Unload material from GPU memory (VRAM)",
+      "name": "GenMeshTangents",
+      "description": "Compute mesh tangents",
       "returnType": "void",
       "params": {
-        "material": "Material"
+        "mesh": "Mesh *"
       }
     },
     {
-      "name": "SetMaterialTexture",
-      "description": "Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)",
+      "name": "GenMeshBinormals",
+      "description": "Compute mesh binormals",
       "returnType": "void",
       "params": {
-        "material": "Material *",
-        "mapType": "int",
-        "texture": "Texture2D"
-      }
-    },
-    {
-      "name": "SetModelMeshMaterial",
-      "description": "Set material for a mesh",
-      "returnType": "void",
-      "params": {
-        "model": "Model *",
-        "meshId": "int",
-        "materialId": "int"
-      }
-    },
-    {
-      "name": "LoadModelAnimations",
-      "description": "Load model animations from file",
-      "returnType": "ModelAnimation *",
-      "params": {
-        "fileName": "const char *",
-        "animsCount": "int *"
-      }
-    },
-    {
-      "name": "UpdateModelAnimation",
-      "description": "Update model animation pose",
-      "returnType": "void",
-      "params": {
-        "model": "Model",
-        "anim": "ModelAnimation",
-        "frame": "int"
-      }
-    },
-    {
-      "name": "UnloadModelAnimation",
-      "description": "Unload animation data",
-      "returnType": "void",
-      "params": {
-        "anim": "ModelAnimation"
-      }
-    },
-    {
-      "name": "UnloadModelAnimations",
-      "description": "Unload animation array data",
-      "returnType": "void",
-      "params": {
-        "animations": "ModelAnimation*",
-        "count": "unsigned int"
-      }
-    },
-    {
-      "name": "IsModelAnimationValid",
-      "description": "Check model animation skeleton match",
-      "returnType": "bool",
-      "params": {
-        "model": "Model",
-        "anim": "ModelAnimation"
+        "mesh": "Mesh *"
       }
     },
     {
@@ -6021,124 +6094,90 @@
       }
     },
     {
-      "name": "GetMeshBoundingBox",
-      "description": "Compute mesh bounding box limits",
-      "returnType": "BoundingBox",
+      "name": "LoadMaterials",
+      "description": "Load materials from model file",
+      "returnType": "Material *",
       "params": {
-        "mesh": "Mesh"
+        "fileName": "const char *",
+        "materialCount": "int *"
       }
     },
     {
-      "name": "MeshTangents",
-      "description": "Compute mesh tangents",
+      "name": "LoadMaterialDefault",
+      "description": "Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)",
+      "returnType": "Material"
+    },
+    {
+      "name": "UnloadMaterial",
+      "description": "Unload material from GPU memory (VRAM)",
       "returnType": "void",
       "params": {
-        "mesh": "Mesh *"
+        "material": "Material"
       }
     },
     {
-      "name": "MeshBinormals",
-      "description": "Compute mesh binormals",
+      "name": "SetMaterialTexture",
+      "description": "Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)",
       "returnType": "void",
       "params": {
-        "mesh": "Mesh *"
+        "material": "Material *",
+        "mapType": "int",
+        "texture": "Texture2D"
       }
     },
     {
-      "name": "DrawModel",
-      "description": "Draw a model (with texture if set)",
+      "name": "SetModelMeshMaterial",
+      "description": "Set material for a mesh",
       "returnType": "void",
       "params": {
-        "model": "Model",
-        "position": "Vector3",
-        "scale": "float",
-        "tint": "Color"
+        "model": "Model *",
+        "meshId": "int",
+        "materialId": "int"
       }
     },
     {
-      "name": "DrawModelEx",
-      "description": "Draw a model with extended parameters",
-      "returnType": "void",
+      "name": "LoadModelAnimations",
+      "description": "Load model animations from file",
+      "returnType": "ModelAnimation *",
       "params": {
-        "model": "Model",
-        "position": "Vector3",
-        "rotationAxis": "Vector3",
-        "rotationAngle": "float",
-        "scale": "Vector3",
-        "tint": "Color"
+        "fileName": "const char *",
+        "animsCount": "int *"
       }
     },
     {
-      "name": "DrawModelWires",
-      "description": "Draw a model wires (with texture if set)",
-      "returnType": "void",
-      "params": {
-        "model": "Model",
-        "position": "Vector3",
-        "scale": "float",
-        "tint": "Color"
-      }
-    },
-    {
-      "name": "DrawModelWiresEx",
-      "description": "Draw a model wires (with texture if set) with extended parameters",
+      "name": "UpdateModelAnimation",
+      "description": "Update model animation pose",
       "returnType": "void",
       "params": {
         "model": "Model",
-        "position": "Vector3",
-        "rotationAxis": "Vector3",
-        "rotationAngle": "float",
-        "scale": "Vector3",
-        "tint": "Color"
+        "anim": "ModelAnimation",
+        "frame": "int"
       }
     },
     {
-      "name": "DrawBoundingBox",
-      "description": "Draw bounding box (wires)",
+      "name": "UnloadModelAnimation",
+      "description": "Unload animation data",
       "returnType": "void",
       "params": {
-        "box": "BoundingBox",
-        "color": "Color"
+        "anim": "ModelAnimation"
       }
     },
     {
-      "name": "DrawBillboard",
-      "description": "Draw a billboard texture",
+      "name": "UnloadModelAnimations",
+      "description": "Unload animation array data",
       "returnType": "void",
       "params": {
-        "camera": "Camera",
-        "texture": "Texture2D",
-        "position": "Vector3",
-        "size": "float",
-        "tint": "Color"
+        "animations": "ModelAnimation*",
+        "count": "unsigned int"
       }
     },
     {
-      "name": "DrawBillboardRec",
-      "description": "Draw a billboard texture defined by source",
-      "returnType": "void",
+      "name": "IsModelAnimationValid",
+      "description": "Check model animation skeleton match",
+      "returnType": "bool",
       "params": {
-        "camera": "Camera",
-        "texture": "Texture2D",
-        "source": "Rectangle",
-        "position": "Vector3",
-        "size": "Vector2",
-        "tint": "Color"
-      }
-    },
-    {
-      "name": "DrawBillboardPro",
-      "description": "Draw a billboard texture defined by source and rotation",
-      "returnType": "void",
-      "params": {
-        "camera": "Camera",
-        "texture": "Texture2D",
-        "source": "Rectangle",
-        "position": "Vector3",
-        "size": "Vector2",
-        "origin": "Vector2",
-        "rotation": "float",
-        "tint": "Color"
+        "model": "Model",
+        "anim": "ModelAnimation"
       }
     },
     {

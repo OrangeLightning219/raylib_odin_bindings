@@ -18,7 +18,7 @@ main :: proc()
     camera.target     = Vector3{ f32(0.0), f32(2.0), f32(0.0) };      // Camera looking at point
     camera.up         = Vector3{ f32(0.0), f32(1.0), f32(0.0) };          // Camera up vector (rotation towards target)
     camera.fovy       = f32(45.0);                                      // Camera field-of-view Y
-    camera.projection = i32(Camera_Projection.CAMERA_PERSPECTIVE);                      // Camera mode type
+    camera.projection = .CAMERA_PERSPECTIVE;                      // Camera mode type
 
     model := load_model("resources/guy/guy.iqm");                      // Load the animated model mesh and basic data
     defer unload_model(model);
@@ -26,7 +26,7 @@ main :: proc()
     texture := load_texture("resources/guy/guytex.png");               // Load model texture and set material
     defer unload_texture(texture);
 
-    set_material_texture(mem.ptr_offset(model.materials, 0), i32(Material_Map_Index.MATERIAL_MAP_ALBEDO), texture);  // Set model material map texture
+    set_material_texture(mem.ptr_offset(model.materials, 0), .MATERIAL_MAP_ALBEDO, texture);  // Set model material map texture
 
     position := Vector3{ f32(0.0), f32(0.0), f32(0.0) };               // Set model position
 
@@ -38,7 +38,7 @@ main :: proc()
 
     anim_frame_counter: i32 = 0;
 
-    set_camera_mode(camera, i32(Camera_Mode.CAMERA_FREE)); // Set free camera mode
+    set_camera_mode(camera, .CAMERA_FREE); // Set free camera mode
 
     set_target_fps(60);                   // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ main :: proc()
         update_camera(&camera);
 
         // Play animation when spacebar is held down
-        if is_key_down(i32(Keyboard_Key.KEY_SPACE))
+        if is_key_down(.KEY_SPACE)
         {
             anim_frame_counter += 1;
             update_model_animation(model, anims[0], anim_frame_counter);

@@ -1,3 +1,4 @@
 *.exe
 *.output
 examples/out/*.dll
+ols.json
