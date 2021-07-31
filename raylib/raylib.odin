@@ -7,7 +7,7 @@ Texture2d :: Texture;
 Texture_Cubemap :: Texture;
 Render_Texture2d :: Render_Texture;
 Camera :: Camera3d;
-Trace_Log_Callback :: proc(log_level: int, text: cstring, args: ..any);
+Trace_Log_Callback :: proc(log_level: Trace_Log_Level, text: cstring, args: ..any);
 Load_File_Data_Callback :: proc(filename: cstring, bytes_read: ^u8) -> ^u8;
 Save_File_Data_Callback :: proc(filename: cstring, data: rawptr, bytes_to_write: u8) -> bool;
 Load_File_Text_Callback :: proc(filename: cstring) -> ^u8;

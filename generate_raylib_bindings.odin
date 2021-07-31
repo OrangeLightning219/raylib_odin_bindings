@@ -359,6 +359,4 @@ main ::proc()
 	generate_structs(file, structs_json);
 	generate_enums(file, enums_json);
 	generate_functions(file, functions_json);
-
-	fmt.println(procedure_argument_type_exceptions[{"is_key_pressed", "key"}]);
 }
