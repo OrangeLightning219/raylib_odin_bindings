@@ -9,7 +9,7 @@ main :: proc()
     screen_width  :: 800;
     screen_height :: 450;
 	
-    init_window(screen_width, screen_height, "raylib [core] example - basic window");
+    init_window(screen_width, screen_height, "raylib [core] example - mouse input");
 	
 	ball_position := Vector2{ -100.0, -100.0 };
     ball_color := DARKBLUE;
