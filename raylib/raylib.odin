@@ -190,7 +190,7 @@ Mesh :: struct
 Shader :: struct
 {
 	id: u32, // Shader program id
-	locs: ^i32, // Shader locations array (MAX_SHADER_LOCATIONS)
+	locs: ^i32, // Shader locations array (RL_MAX_SHADER_LOCATIONS)
 };
 
 Material_Map :: struct
@@ -319,7 +319,7 @@ Vr_Stereo_Config :: struct
 	scale_in: [2]f32, // VR distortion scale in
 };
 
-Config_Flags :: enum
+Config_Flags :: enum u32
 {
 	FLAG_VSYNC_HINT = 64,
 	FLAG_FULLSCREEN_MODE = 2,
@@ -337,7 +337,7 @@ Config_Flags :: enum
 	FLAG_INTERLACED_HINT = 65536,
 };
 
-Trace_Log_Level :: enum
+Trace_Log_Level :: enum u32
 {
 	LOG_ALL = 0,
 	LOG_TRACE = 1,
@@ -349,7 +349,7 @@ Trace_Log_Level :: enum
 	LOG_NONE = 7,
 };
 
-Keyboard_Key :: enum
+Keyboard_Key :: enum u32
 {
 	KEY_NULL = 0,
 	KEY_APOSTROPHE = 39,
@@ -463,7 +463,7 @@ Keyboard_Key :: enum
 	KEY_VOLUME_DOWN = 25,
 };
 
-Mouse_Button :: enum
+Mouse_Button :: enum u32
 {
 	MOUSE_BUTTON_LEFT = 0,
 	MOUSE_BUTTON_RIGHT = 1,
@@ -474,7 +474,7 @@ Mouse_Button :: enum
 	MOUSE_BUTTON_BACK = 6,
 };
 
-Mouse_Cursor :: enum
+Mouse_Cursor :: enum u32
 {
 	MOUSE_CURSOR_DEFAULT = 0,
 	MOUSE_CURSOR_ARROW = 1,
@@ -489,7 +489,7 @@ Mouse_Cursor :: enum
 	MOUSE_CURSOR_NOT_ALLOWED = 10,
 };
 
-Gamepad_Button :: enum
+Gamepad_Button :: enum u32
 {
 	GAMEPAD_BUTTON_UNKNOWN = 0,
 	GAMEPAD_BUTTON_LEFT_FACE_UP = 1,
@@ -511,7 +511,7 @@ Gamepad_Button :: enum
 	GAMEPAD_BUTTON_RIGHT_THUMB = 17,
 };
 
-Gamepad_Axis :: enum
+Gamepad_Axis :: enum u32
 {
 	GAMEPAD_AXIS_LEFT_X = 0,
 	GAMEPAD_AXIS_LEFT_Y = 1,
@@ -521,7 +521,7 @@ Gamepad_Axis :: enum
 	GAMEPAD_AXIS_RIGHT_TRIGGER = 5,
 };
 
-Material_Map_Index :: enum
+Material_Map_Index :: enum u32
 {
 	MATERIAL_MAP_ALBEDO = 0,
 	MATERIAL_MAP_METALNESS = 1,
@@ -536,7 +536,7 @@ Material_Map_Index :: enum
 	MATERIAL_MAP_BRDG = 10,
 };
 
-Shader_Location_Index :: enum
+Shader_Location_Index :: enum u32
 {
 	SHADER_LOC_VERTEX_POSITION = 0,
 	SHADER_LOC_VERTEX_TEXCOORD01 = 1,
@@ -566,7 +566,7 @@ Shader_Location_Index :: enum
 	SHADER_LOC_MAP_BRDF = 25,
 };
 
-Shader_Uniform_Data_Type :: enum
+Shader_Uniform_Data_Type :: enum u32
 {
 	SHADER_UNIFORM_FLOAT = 0,
 	SHADER_UNIFORM_VEC2 = 1,
@@ -579,7 +579,7 @@ Shader_Uniform_Data_Type :: enum
 	SHADER_UNIFORM_SAMPLER2D = 8,
 };
 
-Shader_Attribute_Data_Type :: enum
+Shader_Attribute_Data_Type :: enum u32
 {
 	SHADER_ATTRIB_FLOAT = 0,
 	SHADER_ATTRIB_VEC2 = 1,
@@ -587,7 +587,7 @@ Shader_Attribute_Data_Type :: enum
 	SHADER_ATTRIB_VEC4 = 3,
 };
 
-Pixel_Format :: enum
+Pixel_Format :: enum u32
 {
 	PIXELFORMAT_UNCOMPRESSED_GRAYSCALE = 1,
 	PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA = 2,
@@ -612,7 +612,7 @@ Pixel_Format :: enum
 	PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA = 21,
 };
 
-Texture_Filter :: enum
+Texture_Filter :: enum u32
 {
 	TEXTURE_FILTER_POINT = 0,
 	TEXTURE_FILTER_BILINEAR = 1,
@@ -622,7 +622,7 @@ Texture_Filter :: enum
 	TEXTURE_FILTER_ANISOTROPIC_16X = 5,
 };
 
-Texture_Wrap :: enum
+Texture_Wrap :: enum u32
 {
 	TEXTURE_WRAP_REPEAT = 0,
 	TEXTURE_WRAP_CLAMP = 1,
@@ -630,7 +630,7 @@ Texture_Wrap :: enum
 	TEXTURE_WRAP_MIRROR_CLAMP = 3,
 };
 
-Cubemap_Layout :: enum
+Cubemap_Layout :: enum u32
 {
 	CUBEMAP_LAYOUT_AUTO_DETECT = 0,
 	CUBEMAP_LAYOUT_LINE_VERTICAL = 1,
@@ -640,14 +640,14 @@ Cubemap_Layout :: enum
 	CUBEMAP_LAYOUT_PANORAMA = 5,
 };
 
-Font_Type :: enum
+Font_Type :: enum u32
 {
 	FONT_DEFAULT = 0,
 	FONT_BITMAP = 1,
 	FONT_SDF = 2,
 };
 
-Blend_Mode :: enum
+Blend_Mode :: enum u32
 {
 	BLEND_ALPHA = 0,
 	BLEND_ADDITIVE = 1,
@@ -657,7 +657,7 @@ Blend_Mode :: enum
 	BLEND_CUSTOM = 5,
 };
 
-Gesture :: enum
+Gesture :: enum u32
 {
 	GESTURE_NONE = 0,
 	GESTURE_TAP = 1,
@@ -672,7 +672,7 @@ Gesture :: enum
 	GESTURE_PINCH_OUT = 512,
 };
 
-Camera_Mode :: enum
+Camera_Mode :: enum u32
 {
 	CAMERA_CUSTOM = 0,
 	CAMERA_FREE = 1,
@@ -681,13 +681,13 @@ Camera_Mode :: enum
 	CAMERA_THIRD_PERSON = 4,
 };
 
-Camera_Projection :: enum
+Camera_Projection :: enum u32
 {
 	CAMERA_PERSPECTIVE = 0,
 	CAMERA_ORTHOGRAPHIC = 1,
 };
 
-N_Patch_Layout :: enum
+N_Patch_Layout :: enum u32
 {
 	NPATCH_NINE_PATCH = 0,
 	NPATCH_THREE_PATCH_VERTICAL = 1,
@@ -2293,6 +2293,10 @@ foreign raylib
 	// Generate cylinder mesh
 	@(link_name="GenMeshCylinder")
 	gen_mesh_cylinder :: proc(radius: f32, height: f32, slices: i32) -> Mesh ---;
+
+	// Generate cone/pyramid mesh
+	@(link_name="GenMeshCone")
+	gen_mesh_cone :: proc(radius: f32, height: f32, slices: i32) -> Mesh ---;
 
 	// Generate torus mesh
 	@(link_name="GenMeshTorus")

@@ -228,7 +228,7 @@ generate_enums :: proc(file: os.Handle, enums_json: json.Array)
 		
 		write_string_builder(&enum_builder, "\n");
 		write_string_builder(&enum_builder, to_ada_case(enum_name));
-		write_string_builder(&enum_builder, " :: enum\n");
+		write_string_builder(&enum_builder, " :: enum u32\n");
 		write_string_builder(&enum_builder, "{\n");
 		
 		for value in values

@@ -477,7 +477,7 @@
         {
           "name": "locs",
           "type": "int *",
-          "description": "Shader locations array (MAX_SHADER_LOCATIONS)"
+          "description": "Shader locations array (RL_MAX_SHADER_LOCATIONS)"
         }
       ]
     },
@@ -6046,6 +6046,16 @@
     {
       "name": "GenMeshCylinder",
       "description": "Generate cylinder mesh",
+      "returnType": "Mesh",
+      "params": {
+        "radius": "float",
+        "height": "float",
+        "slices": "int"
+      }
+    },
+    {
+      "name": "GenMeshCone",
+      "description": "Generate cone/pyramid mesh",
       "returnType": "Mesh",
       "params": {
         "radius": "float",
