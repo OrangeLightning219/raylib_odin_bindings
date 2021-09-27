@@ -132,7 +132,7 @@ N_Patch_Info :: struct
 	layout: i32, // Layout of the n-patch: 3x3, 1x3 or 3x1
 };
 
-Char_Info :: struct
+Glyph_Info :: struct
 {
 	value: i32, // Character value (Unicode)
 	offset_x: i32, // Character offset X when drawing
@@ -144,11 +144,11 @@ Char_Info :: struct
 Font :: struct
 {
 	base_size: i32, // Base size (default chars height)
-	chars_count: i32, // Number of characters
-	chars_padding: i32, // Padding around the chars
-	texture: Texture2d, // Characters texture atlas
-	recs: ^Rectangle, // Characters rectangles in texture
-	chars: ^Char_Info, // Characters info data
+	glyph_count: i32, // Number of glyph characters
+	glyph_padding: i32, // Padding around the glyph characters
+	texture: Texture2d, // Texture atlas containing the glyphs
+	recs: ^Rectangle, // Rectangles in texture for the glyphs
+	glyphs: ^Glyph_Info, // Glyphs info data
 };
 
 Camera3d :: struct
@@ -263,10 +263,10 @@ Bounding_Box :: struct
 
 Wave :: struct
 {
-	sample_count: u32, // Total number of samples (considering channels!)
+	frame_count: u32, // Total number of frames (considering channels)
 	sample_rate: u32, // Frequency (samples per second)
 	sample_size: u32, // Bit depth (bits per sample): 8, 16, 32 (24 not supported)
-	channels: u32, // Number of channels (1-mono, 2-stereo)
+	channels: u32, // Number of channels (1-mono, 2-stereo, ...)
 	data: rawptr, // Buffer data pointer
 };
 
@@ -275,19 +275,19 @@ Audio_Stream :: struct
 	buffer: ^r_Audio_Buffer, // Pointer to internal data used by the audio system
 	sample_rate: u32, // Frequency (samples per second)
 	sample_size: u32, // Bit depth (bits per sample): 8, 16, 32 (24 not supported)
-	channels: u32, // Number of channels (1-mono, 2-stereo)
+	channels: u32, // Number of channels (1-mono, 2-stereo, ...)
 };
 
 Sound :: struct
 {
 	stream: Audio_Stream, // Audio stream
-	sample_count: u32, // Total number of samples
+	frame_count: u32, // Total number of frames (considering channels)
 };
 
 Music :: struct
 {
 	stream: Audio_Stream, // Audio stream
-	sample_count: u32, // Total number of samples
+	frame_count: u32, // Total number of frames (considering channels)
 	looping: bool, // Music looping enable
 	ctx_type: i32, // Type of music context (audio filetype)
 	ctx_data: rawptr, // Audio context data, depends on type
@@ -1046,6 +1046,10 @@ foreign raylib
 	@(link_name="GetRandomValue")
 	get_random_value :: proc(min: i32, max: i32) -> i32 ---;
 
+	// Set the seed for the random number generator
+	@(link_name="SetRandomSeed")
+	set_random_seed :: proc(seed: u32) ---;
+
 	// Takes a screenshot of current screen (filename extension defines format)
 	@(link_name="TakeScreenshot")
 	take_screenshot :: proc(file_name: cstring) ---;
@@ -1222,11 +1226,11 @@ foreign raylib
 	@(link_name="SetExitKey")
 	set_exit_key :: proc(key: Keyboard_Key) ---;
 
-	// Get key pressed (keycode), call it multiple times for keys queued
+	// Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty
 	@(link_name="GetKeyPressed")
 	get_key_pressed :: proc() -> i32 ---;
 
-	// Get char pressed (unicode), call it multiple times for chars queued
+	// Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty
 	@(link_name="GetCharPressed")
 	get_char_pressed :: proc() -> i32 ---;
 
@@ -1338,6 +1342,18 @@ foreign raylib
 	@(link_name="GetTouchPosition")
 	get_touch_position :: proc(index: i32) -> Vector2 ---;
 
+	// Get touch point identifier for given index
+	@(link_name="GetTouchPointId")
+	get_touch_point_id :: proc(index: i32) -> i32 ---;
+
+	// Get number of touch points
+	@(link_name="GetTouchPointCount")
+	get_touch_point_count :: proc() -> i32 ---;
+
+	// Get last touch event registered
+	@(link_name="GetTouchEvent")
+	get_touch_event :: proc() -> i32 ---;
+
 	// Enable a set of gestures using flags
 	@(link_name="SetGesturesEnabled")
 	set_gestures_enabled :: proc(flags: u32) ---;
@@ -1349,10 +1365,6 @@ foreign raylib
 	// Get latest detected gesture
 	@(link_name="GetGestureDetected")
 	get_gesture_detected :: proc() -> i32 ---;
-
-	// Get touch points count
-	@(link_name="GetTouchPointsCount")
-	get_touch_points_count :: proc() -> i32 ---;
 
 	// Get gesture hold time in milliseconds
 	@(link_name="GetGestureHoldDuration")
@@ -1432,7 +1444,7 @@ foreign raylib
 
 	// Draw lines sequence
 	@(link_name="DrawLineStrip")
-	draw_line_strip :: proc(points: ^Vector2, points_count: i32, color: Color) ---;
+	draw_line_strip :: proc(points: ^Vector2, point_count: i32, color: Color) ---;
 
 	// Draw a color-filled circle
 	@(link_name="DrawCircle")
@@ -1528,11 +1540,11 @@ foreign raylib
 
 	// Draw a triangle fan defined by points (first vertex is the center)
 	@(link_name="DrawTriangleFan")
-	draw_triangle_fan :: proc(points: ^Vector2, points_count: i32, color: Color) ---;
+	draw_triangle_fan :: proc(points: ^Vector2, point_count: i32, color: Color) ---;
 
 	// Draw a triangle strip defined by points
 	@(link_name="DrawTriangleStrip")
-	draw_triangle_strip :: proc(points: ^Vector2, points_count: i32, color: Color) ---;
+	draw_triangle_strip :: proc(points: ^Vector2, point_count: i32, color: Color) ---;
 
 	// Draw a regular polygon (Vector version)
 	@(link_name="DrawPoly")
@@ -1642,7 +1654,7 @@ foreign raylib
 	@(link_name="GenImagePerlinNoise")
 	gen_image_perlin_noise :: proc(width: i32, height: i32, offset_x: i32, offset_y: i32, scale: f32) -> Image ---;
 
-	// Generate image: cellular algorithm. Bigger tileSize means bigger cells
+	// Generate image: cellular algorithm, bigger tileSize means bigger cells
 	@(link_name="GenImageCellular")
 	gen_image_cellular :: proc(width: i32, height: i32, tile_size: i32) -> Image ---;
 
@@ -1756,7 +1768,7 @@ foreign raylib
 
 	// Load colors palette from image as a Color array (RGBA - 32bit)
 	@(link_name="LoadImagePalette")
-	load_image_palette :: proc(image: Image, max_palette_size: i32, colors_count: ^i32) -> ^Color ---;
+	load_image_palette :: proc(image: Image, max_palette_size: i32, color_count: ^i32) -> ^Color ---;
 
 	// Unload color data loaded with LoadImageColors()
 	@(link_name="UnloadImageColors")
@@ -1904,7 +1916,7 @@ foreign raylib
 
 	// Draw a textured polygon
 	@(link_name="DrawTexturePoly")
-	draw_texture_poly :: proc(texture: Texture2d, center: Vector2, points: ^Vector2, texcoords: ^Vector2, points_count: i32, tint: Color) ---;
+	draw_texture_poly :: proc(texture: Texture2d, center: Vector2, points: ^Vector2, texcoords: ^Vector2, point_count: i32, tint: Color) ---;
 
 	// Get color with alpha applied, alpha goes from 0.0f to 1.0f
 	@(link_name="Fade")
@@ -1940,7 +1952,7 @@ foreign raylib
 
 	// Get Color structure from hexadecimal value
 	@(link_name="GetColor")
-	get_color :: proc(hex_value: i32) -> Color ---;
+	get_color :: proc(hex_value: u32) -> Color ---;
 
 	// Get Color from a source pixel pointer of certain format
 	@(link_name="GetPixelColor")
@@ -1964,7 +1976,7 @@ foreign raylib
 
 	// Load font from file with extended parameters
 	@(link_name="LoadFontEx")
-	load_font_ex :: proc(file_name: cstring, font_size: i32, font_chars: ^i32, chars_count: i32) -> Font ---;
+	load_font_ex :: proc(file_name: cstring, font_size: i32, font_chars: ^i32, glyph_count: i32) -> Font ---;
 
 	// Load font from Image (XNA style)
 	@(link_name="LoadFontFromImage")
@@ -1972,19 +1984,19 @@ foreign raylib
 
 	// Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
 	@(link_name="LoadFontFromMemory")
-	load_font_from_memory :: proc(file_type: cstring, file_data: ^u8, data_size: i32, font_size: i32, font_chars: ^i32, chars_count: i32) -> Font ---;
+	load_font_from_memory :: proc(file_type: cstring, file_data: ^u8, data_size: i32, font_size: i32, font_chars: ^i32, glyph_count: i32) -> Font ---;
 
 	// Load font data for further use
 	@(link_name="LoadFontData")
-	load_font_data :: proc(file_data: ^u8, data_size: i32, font_size: i32, font_chars: ^i32, chars_count: i32, type: i32) -> ^Char_Info ---;
+	load_font_data :: proc(file_data: ^u8, data_size: i32, font_size: i32, font_chars: ^i32, glyph_count: i32, type: i32) -> ^Glyph_Info ---;
 
 	// Generate image font atlas using chars info
 	@(link_name="GenImageFontAtlas")
-	gen_image_font_atlas :: proc(chars: ^Char_Info, recs: ^^Rectangle, chars_count: i32, font_size: i32, padding: i32, pack_method: i32) -> Image ---;
+	gen_image_font_atlas :: proc(chars: ^Glyph_Info, recs: ^^Rectangle, glyph_count: i32, font_size: i32, padding: i32, pack_method: i32) -> Image ---;
 
 	// Unload font chars info data (RAM)
 	@(link_name="UnloadFontData")
-	unload_font_data :: proc(chars: ^Char_Info, chars_count: i32) ---;
+	unload_font_data :: proc(chars: ^Glyph_Info, glyph_count: i32) ---;
 
 	// Unload Font from GPU memory (VRAM)
 	@(link_name="UnloadFont")
@@ -2002,13 +2014,9 @@ foreign raylib
 	@(link_name="DrawTextEx")
 	draw_text_ex :: proc(font: Font, text: cstring, position: Vector2, font_size: f32, spacing: f32, tint: Color) ---;
 
-	// Draw text using font inside rectangle limits
-	@(link_name="DrawTextRec")
-	draw_text_rec :: proc(font: Font, text: cstring, rec: Rectangle, font_size: f32, spacing: f32, word_wrap: bool, tint: Color) ---;
-
-	// Draw text using font inside rectangle limits with support for text selection
-	@(link_name="DrawTextRecEx")
-	draw_text_rec_ex :: proc(font: Font, text: cstring, rec: Rectangle, font_size: f32, spacing: f32, word_wrap: bool, tint: Color, select_start: i32, select_length: i32, select_tint: Color, select_back_tint: Color) ---;
+	// Draw text using Font and pro parameters (rotation)
+	@(link_name="DrawTextPro")
+	draw_text_pro :: proc(font: Font, text: cstring, position: Vector2, origin: Vector2, rotation: f32, font_size: f32, spacing: f32, tint: Color) ---;
 
 	// Draw one character (codepoint)
 	@(link_name="DrawTextCodepoint")
@@ -2022,9 +2030,41 @@ foreign raylib
 	@(link_name="MeasureTextEx")
 	measure_text_ex :: proc(font: Font, text: cstring, font_size: f32, spacing: f32) -> Vector2 ---;
 
-	// Get index position for a unicode character on font
+	// Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
 	@(link_name="GetGlyphIndex")
 	get_glyph_index :: proc(font: Font, codepoint: i32) -> i32 ---;
+
+	// Get glyph font info data for a codepoint (unicode character), fallback to '?' if not found
+	@(link_name="GetGlyphInfo")
+	get_glyph_info :: proc(font: Font, codepoint: i32) -> Glyph_Info ---;
+
+	// Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
+	@(link_name="GetGlyphAtlasRec")
+	get_glyph_atlas_rec :: proc(font: Font, codepoint: i32) -> Rectangle ---;
+
+	// Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
+	@(link_name="LoadCodepoints")
+	load_codepoints :: proc(text: cstring, count: ^i32) -> ^i32 ---;
+
+	// Unload codepoints data from memory
+	@(link_name="UnloadCodepoints")
+	unload_codepoints :: proc(codepoints: ^i32) ---;
+
+	// Get total number of codepoints in a UTF-8 encoded string
+	@(link_name="GetCodepointCount")
+	get_codepoint_count :: proc(text: cstring) -> i32 ---;
+
+	// Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+	@(link_name="GetCodepoint")
+	get_codepoint :: proc(text: cstring, bytes_processed: ^i32) -> i32 ---;
+
+	// Encode one codepoint into UTF-8 byte array (array length returned as parameter)
+	@(link_name="CodepointToUTF8")
+	codepoint_to_utf8 :: proc(codepoint: i32, byte_size: ^i32) -> cstring ---;
+
+	// Encode text as codepoints array into UTF-8 text string (WARNING: memory must be freed!)
+	@(link_name="TextCodepointsToUTF8")
+	text_codepoints_to_utf8 :: proc(codepoints: ^i32, length: i32) -> ^u8 ---;
 
 	// Copy one string to another, returns bytes copied
 	@(link_name="TextCopy")
@@ -2038,7 +2078,7 @@ foreign raylib
 	@(link_name="TextLength")
 	text_length :: proc(text: cstring) -> u32 ---;
 
-	// Text formatting with variables (sprintf style)
+	// Text formatting with variables (sprintf() style)
 	@(link_name="TextFormat")
 	text_format :: proc(text: cstring, #c_vararg args: ..any) -> cstring ---;
 
@@ -2046,11 +2086,11 @@ foreign raylib
 	@(link_name="TextSubtext")
 	text_subtext :: proc(text: cstring, position: i32, length: i32) -> cstring ---;
 
-	// Replace text string (memory must be freed!)
+	// Replace text string (WARNING: memory must be freed!)
 	@(link_name="TextReplace")
 	text_replace :: proc(text: ^u8, replace: cstring, by: cstring) -> ^u8 ---;
 
-	// Insert text in a position (memory must be freed!)
+	// Insert text in a position (WARNING: memory must be freed!)
 	@(link_name="TextInsert")
 	text_insert :: proc(text: cstring, insert: cstring, position: i32) -> ^u8 ---;
 
@@ -2086,30 +2126,6 @@ foreign raylib
 	@(link_name="TextToInteger")
 	text_to_integer :: proc(text: cstring) -> i32 ---;
 
-	// Encode text codepoint into utf8 text (memory must be freed!)
-	@(link_name="TextToUtf8")
-	text_to_utf8 :: proc(codepoints: ^i32, length: i32) -> ^u8 ---;
-
-	// Load all codepoints from a UTF8 text string, codepoints count returned by parameter
-	@(link_name="LoadCodepoints")
-	load_codepoints :: proc(text: cstring, count: ^i32) -> ^i32 ---;
-
-	// Unload codepoints data from memory
-	@(link_name="UnloadCodepoints")
-	unload_codepoints :: proc(codepoints: ^i32) ---;
-
-	// Get total number of characters (codepoints) in a UTF8 encoded string
-	@(link_name="GetCodepointsCount")
-	get_codepoints_count :: proc(text: cstring) -> i32 ---;
-
-	// Get next codepoint in a UTF8 encoded string, 0x3f('?') is returned on failure
-	@(link_name="GetCodepoint")
-	get_codepoint :: proc(text: cstring, bytes_processed: ^i32) -> i32 ---;
-
-	// Encode codepoint into utf8 text (char array length returned as parameter)
-	@(link_name="CodepointToUtf8")
-	codepoint_to_utf8 :: proc(codepoint: i32, byte_length: ^i32) -> cstring ---;
-
 	// Draw a line in 3D world space
 	@(link_name="DrawLine3D")
 	draw_line3d :: proc(start_pos: Vector3, end_pos: Vector3, color: Color) ---;
@@ -2128,7 +2144,7 @@ foreign raylib
 
 	// Draw a triangle strip defined by points
 	@(link_name="DrawTriangleStrip3D")
-	draw_triangle_strip3d :: proc(points: ^Vector3, points_count: i32, color: Color) ---;
+	draw_triangle_strip3d :: proc(points: ^Vector3, point_count: i32, color: Color) ---;
 
 	// Draw cube
 	@(link_name="DrawCube")
@@ -2149,6 +2165,10 @@ foreign raylib
 	// Draw cube textured
 	@(link_name="DrawCubeTexture")
 	draw_cube_texture :: proc(texture: Texture2d, position: Vector3, width: f32, height: f32, length: f32, color: Color) ---;
+
+	// Draw cube with a region of a texture
+	@(link_name="DrawCubeTextureRec")
+	draw_cube_texture_rec :: proc(texture: Texture2d, source: Rectangle, position: Vector3, width: f32, height: f32, length: f32, color: Color) ---;
 
 	// Draw sphere
 	@(link_name="DrawSphere")
@@ -2232,7 +2252,7 @@ foreign raylib
 
 	// Draw a billboard texture defined by source and rotation
 	@(link_name="DrawBillboardPro")
-	draw_billboard_pro :: proc(camera: Camera, texture: Texture2d, source: Rectangle, position: Vector3, size: Vector2, origin: Vector2, rotation: f32, tint: Color) ---;
+	draw_billboard_pro :: proc(camera: Camera, texture: Texture2d, source: Rectangle, position: Vector3, up: Vector3, size: Vector2, origin: Vector2, rotation: f32, tint: Color) ---;
 
 	// Upload mesh vertex data in GPU and provide VAO/VBO ids
 	@(link_name="UploadMesh")
@@ -2336,7 +2356,7 @@ foreign raylib
 
 	// Load model animations from file
 	@(link_name="LoadModelAnimations")
-	load_model_animations :: proc(file_name: cstring, anims_count: ^i32) -> ^Model_Animation ---;
+	load_model_animations :: proc(file_name: cstring, anim_count: ^u32) -> ^Model_Animation ---;
 
 	// Update model animation pose
 	@(link_name="UpdateModelAnimation")
@@ -2424,7 +2444,7 @@ foreign raylib
 
 	// Update sound buffer with new data
 	@(link_name="UpdateSound")
-	update_sound :: proc(sound: Sound, data: rawptr, samples_count: i32) ---;
+	update_sound :: proc(sound: Sound, data: rawptr, sample_count: i32) ---;
 
 	// Unload wave data
 	@(link_name="UnloadWave")
@@ -2538,6 +2558,10 @@ foreign raylib
 	@(link_name="ResumeMusicStream")
 	resume_music_stream :: proc(music: Music) ---;
 
+	// Seek music to a position (in seconds)
+	@(link_name="SeekMusicStream")
+	seek_music_stream :: proc(music: Music, position: f32) ---;
+
 	// Set volume for music (1.0 is max level)
 	@(link_name="SetMusicVolume")
 	set_music_volume :: proc(music: Music, volume: f32) ---;
@@ -2564,7 +2588,7 @@ foreign raylib
 
 	// Update audio stream buffers with data
 	@(link_name="UpdateAudioStream")
-	update_audio_stream :: proc(stream: Audio_Stream, data: rawptr, samples_count: i32) ---;
+	update_audio_stream :: proc(stream: Audio_Stream, data: rawptr, frame_count: i32) ---;
 
 	// Check if any audio stream buffers requires refill
 	@(link_name="IsAudioStreamProcessed")
